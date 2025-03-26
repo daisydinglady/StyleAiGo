@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智衣橱 - 天气+穿搭</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .status-bar {
+            height: 44px;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-bottom: 1px solid #eaeaea;
+        }
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 70px;
+        }
+        .tab-bar {
+            height: 60px;
+            background-color: #ffffff;
+            border-top: 1px solid #eaeaea;
+            display: flex;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            box-shadow: 0 -1px 5px rgba(0,0,0,0.05);
+        }
+        .tab {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+        }
+        .tab.active {
+            color: #3B82F6;
+        }
+        .tab-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        .tab-text {
+            font-size: 12px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-left: 16px;
+        }
+        .wardrobe-layout {
+            display: flex;
+        }
+        .side-category {
+            width: 90px;
+            background-color: #fff;
+            border-right: 1px solid #eaeaea;
+            overflow-y: auto;
+            max-height: calc(100vh - 180px);
+        }
+        .category-tab {
+            padding: 12px 0;
+            text-align: center;
+            font-size: 14px;
+            border-bottom: 1px solid #eaeaea;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .category-tab i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        .category-tab.active {
+            color: #3B82F6;
+            background-color: #f0f7ff;
+            border-left: 3px solid #3B82F6;
+        }
+        .wardrobe-content {
+            flex: 1;
+            padding: 0 10px;
+        }
+        .wardrobe-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        .wardrobe-item {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .wardrobe-item-img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+        .wardrobe-item-info {
+            padding: 12px;
+        }
+        .item-name {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .item-category {
+            color: #666;
+            font-size: 13px;
+        }
+        .outfit-section {
+            margin-top: 30px;
+        }
+        .outfit-card {
+            background-color: white;
+            border-radius: 16px;
+            margin: 0 16px 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .outfit-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .outfit-info {
+            padding: 16px;
+        }
+        .outfit-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .outfit-desc {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .action-button {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #f0f0f0;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-bar">
+        <h1 class="text-base font-medium">智衣橱</h1>
+    </div>
+    
+    <div class="content">
+        <!-- 衣橱分类 -->
+        <div class="section">
+            <h2 class="section-title">我的衣橱</h2>
+            
+            <div class="wardrobe-layout">
+                <!-- 左侧分类 -->
+                <div class="side-category">
+                    <div class="category-tab active">
+                        <i class="fas fa-border-all"></i>
+                        <span>全部</span>
+                    </div>
+                    <div class="category-tab">
+                        <i class="fas fa-tshirt"></i>
+                        <span>上衣</span>
+                    </div>
+                    <div class="category-tab">
+                        <i class="fas fa-socks"></i>
+                        <span>裤装</span>
+                    </div>
+                    <div class="category-tab">
+                        <i class="fas fa-mitten"></i>
+                        <span>外套</span>
+                    </div>
+                    <div class="category-tab">
+                        <i class="fas fa-shoe-prints"></i>
+                        <span>鞋子</span>
+                    </div>
+                    <div class="category-tab">
+                        <i class="fas fa-gem"></i>
+                        <span>配饰</span>
+                    </div>
+                    <div class="category-tab">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span>包包</span>
+                    </div>
+                </div>
+                
+                <!-- 右侧内容 -->
+                <div class="wardrobe-content">
+                    <div class="wardrobe-grid">
+                        <!-- 衣橱项目1 -->
+                        <div class="wardrobe-item" data-category="上衣">
+                            <img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="白色T恤" class="wardrobe-item-img">
+                            <div class="wardrobe-item-info">
+                                <div class="item-name">基础白色T恤</div>
+                                <div class="item-category">上衣 · 休闲</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 衣橱项目2 -->
+                        <div class="wardrobe-item" data-category="裤装">
+                            <img src="https://images.unsplash.com/photo-1542060748-10c28b62716f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="蓝色牛仔裤" class="wardrobe-item-img">
+                            <div class="wardrobe-item-info">
+                                <div class="item-name">复古直筒牛仔裤</div>
+                                <div class="item-category">裤装 · 休闲</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 衣橱项目3 -->
+                        <div class="wardrobe-item" data-category="鞋子">
+                            <img src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="白色运动鞋" class="wardrobe-item-img">
+                            <div class="wardrobe-item-info">
+                                <div class="item-name">简约小白鞋</div>
+                                <div class="item-category">鞋子 · 休闲</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 衣橱项目4 -->
+                        <div class="wardrobe-item" data-category="上衣">
+                            <img src="https://images.unsplash.com/photo-1591369822096-ffd140ec948f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="黑色长袖T恤" class="wardrobe-item-img">
+                            <div class="wardrobe-item-info">
+                                <div class="item-name">黑色长袖T恤</div>
+                                <div class="item-category">上衣 · 休闲</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 衣橱项目5 -->
+                        <div class="wardrobe-item" data-category="外套">
+                            <img src="https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="黑色运动外套" class="wardrobe-item-img">
+                            <div class="wardrobe-item-info">
+                                <div class="item-name">黑色运动外套</div>
+                                <div class="item-category">外套 · 运动</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 衣橱项目6 -->
+                        <div class="wardrobe-item" data-category="裤装">
+                            <img src="https://images.unsplash.com/photo-1556306535-0f09a537f0a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="卡其色休闲裤" class="wardrobe-item-img">
+                            <div class="wardrobe-item-info">
+                                <div class="item-name">卡其色休闲裤</div>
+                                <div class="item-category">裤装 · 商务休闲</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4 mb-6">
+                <button class="bg-blue-500 text-white py-2 px-6 rounded-full text-sm font-medium hover:bg-blue-600 transition">
+                    <i class="fas fa-plus mr-2"></i>添加新衣物
+                </button>
+            </div>
+        </div>
+        
+        <!-- 推荐搭配 -->
+        <div class="outfit-section">
+            <h2 class="section-title">为你推荐的搭配</h2>
+            
+            <div class="outfit-card">
+                <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="休闲搭配" class="outfit-img">
+                <div class="outfit-info">
+                    <div class="outfit-title">轻松休闲日常</div>
+                    <div class="outfit-desc">白色T恤 + 牛仔裤 + 小白鞋的经典组合，适合周末外出、购物或与朋友聚会。</div>
+                    <div class="flex">
+                        <div class="action-button">
+                            <i class="far fa-heart mr-1"></i>
+                            收藏
+                        </div>
+                        <div class="action-button">
+                            <i class="far fa-bookmark mr-1"></i>
+                            保存
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="outfit-card">
+                <img src="https://images.unsplash.com/photo-1612215031034-b0531a731f06?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="休闲搭配" class="outfit-img">
+                <div class="outfit-info">
+                    <div class="outfit-title">商务休闲风格</div>
+                    <div class="outfit-desc">黑色长袖T恤 + 卡其色休闲裤 + 小白鞋，适合轻商务场合或日常办公。</div>
+                    <div class="flex">
+                        <div class="action-button">
+                            <i class="far fa-heart mr-1"></i>
+                            收藏
+                        </div>
+                        <div class="action-button">
+                            <i class="far fa-bookmark mr-1"></i>
+                            保存
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部导航栏 -->
+    <div class="tab-bar">
+        <a href="ootd.html" class="tab">
+            <div class="tab-icon"><i class="fas fa-tshirt"></i></div>
+            <div class="tab-text">OOTD</div>
+        </a>
+        <a href="wardrobe.html" class="tab active">
+            <div class="tab-icon"><i class="fas fa-box-open"></i></div>
+            <div class="tab-text">智衣橱</div>
+        </a>
+        <a href="profile.html" class="tab">
+            <div class="tab-icon"><i class="fas fa-user"></i></div>
+            <div class="tab-text">我的</div>
+        </a>
+    </div>
+    
+    <script>
+        // 分类标签点击事件
+        const categoryTabs = document.querySelectorAll('.category-tab');
+        const wardrobeItems = document.querySelectorAll('.wardrobe-item');
+        
+        categoryTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除当前选中状态
+                categoryTabs.forEach(t => t.classList.remove('active'));
+                // 设置新的选中状态
+                tab.classList.add('active');
+                
+                // 筛选衣物
+                const selectedCategory = tab.querySelector('span').textContent;
+                
+                wardrobeItems.forEach(item => {
+                    const itemCategory = item.getAttribute('data-category');
+                    
+                    if (selectedCategory === '全部' || itemCategory === selectedCategory) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+        
+        // 收藏按钮点击事件
+        const heartButtons = document.querySelectorAll('.action-button .fa-heart');
+        heartButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                button.classList.toggle('far');
+                button.classList.toggle('fas');
+                button.classList.toggle('text-red-500');
+            });
+        });
+    </script>
+</body>
+</html> 

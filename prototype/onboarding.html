@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>欢迎使用 - 天气+穿搭</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .status-bar {
+            height: 44px;
+            background-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .onboarding-page {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 0 24px;
+        }
+        .onboarding-header {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+        .onboarding-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .onboarding-subtitle {
+            font-size: 16px;
+            color: #666;
+        }
+        .form-group {
+            margin-bottom: 24px;
+        }
+        .form-label {
+            display: block;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus {
+            border-color: #3B82F6;
+        }
+        .gender-selector {
+            display: flex;
+            gap: 16px;
+        }
+        .gender-option {
+            flex: 1;
+            padding: 16px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .gender-option.selected {
+            border-color: #3B82F6;
+            background-color: #e0f2fe;
+        }
+        .gender-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        .male-icon {
+            color: #3B82F6;
+        }
+        .female-icon {
+            color: #EC4899;
+        }
+        .gender-text {
+            font-weight: 500;
+        }
+        .bottom-nav {
+            position: sticky;
+            bottom: 0;
+            padding: 16px 24px 32px;
+            background-color: #f7f7f7;
+        }
+        .skip-button {
+            text-align: center;
+            color: #666;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin: 0 4px;
+        }
+        .progress-dot.active {
+            background-color: #3B82F6;
+            width: 24px;
+            border-radius: 4px;
+        }
+        .welcome-illustration {
+            max-width: 240px;
+            margin: 0 auto 32px;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-bar">
+        <h1 class="text-base font-medium text-gray-500">设置你的个人信息</h1>
+    </div>
+    
+    <div class="content">
+        <!-- 第一步：欢迎页面 -->
+        <div class="onboarding-page" id="page-1">
+            <div class="onboarding-header">
+                <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f31f.png" alt="欢迎" class="welcome-illustration">
+                <h1 class="onboarding-title">欢迎使用天气+OOTD</h1>
+                <p class="onboarding-subtitle">开始你的智能穿搭之旅</p>
+            </div>
+            
+            <p class="text-center text-gray-600 mb-10">
+                为了给你提供更准确的穿搭建议，<br>
+                我们需要收集一些基本信息
+            </p>
+            
+            <div class="mt-auto mb-10">
+                <button onclick="goToPage(2)" class="w-full bg-blue-500 text-white py-4 rounded-full font-medium hover:bg-blue-600 transition">
+                    开始设置
+                </button>
+            </div>
+        </div>
+        
+        <!-- 第二步：城市选择 -->
+        <div class="onboarding-page hidden" id="page-2">
+            <div class="onboarding-header">
+                <h1 class="onboarding-title">你在哪个城市？</h1>
+                <p class="onboarding-subtitle">这将帮助我们获取准确的天气信息</p>
+            </div>
+            
+            <div class="form-group">
+                <label for="city-input" class="form-label">所在城市</label>
+                <div class="relative">
+                    <input type="text" id="city-input" class="form-input pr-10" placeholder="例如：北京、上海、广州...">
+                    <button class="absolute right-3 top-3 text-blue-500">
+                        <i class="fas fa-location-dot text-xl"></i>
+                    </button>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    你可以点击定位图标获取当前位置
+                </p>
+            </div>
+            
+            <div class="mt-auto bottom-nav">
+                <div class="progress-dots">
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot active"></div>
+                    <div class="progress-dot"></div>
+                </div>
+                <button onclick="goToPage(3)" class="w-full bg-blue-500 text-white py-4 rounded-full font-medium hover:bg-blue-600 transition">
+                    下一步
+                </button>
+                <div class="skip-button" onclick="goToPage(3)">
+                    稍后设置
+                </div>
+            </div>
+        </div>
+        
+        <!-- 第三步：性别选择 -->
+        <div class="onboarding-page hidden" id="page-3">
+            <div class="onboarding-header">
+                <h1 class="onboarding-title">选择你的性别</h1>
+                <p class="onboarding-subtitle">帮助我们提供更适合你的穿搭风格</p>
+            </div>
+            
+            <div class="form-group">
+                <div class="gender-selector">
+                    <div class="gender-option" onclick="selectGender('male', this)">
+                        <div class="gender-icon male-icon">
+                            <i class="fas fa-mars"></i>
+                        </div>
+                        <div class="gender-text">男生</div>
+                    </div>
+                    <div class="gender-option" onclick="selectGender('female', this)">
+                        <div class="gender-icon female-icon">
+                            <i class="fas fa-venus"></i>
+                        </div>
+                        <div class="gender-text">女生</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-auto bottom-nav">
+                <div class="progress-dots">
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot active"></div>
+                </div>
+                <button onclick="goToPage(4)" class="w-full bg-blue-500 text-white py-4 rounded-full font-medium hover:bg-blue-600 transition">
+                    下一步
+                </button>
+                <div class="skip-button" onclick="goToPage(4)">
+                    稍后设置
+                </div>
+            </div>
+        </div>
+        
+        <!-- 第四步：个人描述 -->
+        <div class="onboarding-page hidden" id="page-4">
+            <div class="onboarding-header">
+                <h1 class="onboarding-title">完善你的个人信息</h1>
+                <p class="onboarding-subtitle">帮助我们了解你的穿搭喜好</p>
+            </div>
+            
+            <div class="form-group">
+                <label for="description-input" class="form-label">个人描述</label>
+                <textarea id="description-input" class="form-input h-32" placeholder="描述你的穿衣风格、喜好或特点..."></textarea>
+            </div>
+            
+            <div class="mt-auto bottom-nav">
+                <button onclick="finishOnboarding()" class="w-full bg-blue-500 text-white py-4 rounded-full font-medium hover:bg-blue-600 transition">
+                    开始使用
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentPage = 1;
+        let selectedGender = null;
+        
+        // 页面切换
+        function goToPage(pageNum) {
+            document.getElementById(`page-${currentPage}`).classList.add('hidden');
+            document.getElementById(`page-${pageNum}`).classList.remove('hidden');
+            currentPage = pageNum;
+        }
+        
+        // 性别选择
+        function selectGender(gender, element) {
+            const genderOptions = document.querySelectorAll('.gender-option');
+            genderOptions.forEach(option => option.classList.remove('selected'));
+            
+            element.classList.add('selected');
+            selectedGender = gender;
+        }
+        
+        // 完成引导
+        function finishOnboarding() {
+            window.location.href = 'ootd.html';
+        }
+    </script>
+</body>
+</html> 

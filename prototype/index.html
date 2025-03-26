@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天气+OOTD小程序原型</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+        .phone-frame {
+            width: 390px;
+            height: 844px;
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: 12px solid #121212;
+            position: relative;
+        }
+        .phone-frame iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .notch {
+            position: absolute;
+            width: 150px;
+            height: 30px;
+            background-color: #121212;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body class="p-10">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-center">天气+OOTD小程序原型设计</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 justify-items-center">
+            <!-- OOTD页面 -->
+            <div class="flex flex-col items-center">
+                <h2 class="text-xl font-semibold mb-4">OOTD页面</h2>
+                <div class="phone-frame">
+                    <div class="notch"></div>
+                    <iframe src="ootd.html"></iframe>
+                </div>
+            </div>
+            
+            <!-- 智衣橱页面 -->
+            <div class="flex flex-col items-center">
+                <h2 class="text-xl font-semibold mb-4">智衣橱页面</h2>
+                <div class="phone-frame">
+                    <div class="notch"></div>
+                    <iframe src="wardrobe.html"></iframe>
+                </div>
+            </div>
+            
+            <!-- 我的页面 -->
+            <div class="flex flex-col items-center">
+                <h2 class="text-xl font-semibold mb-4">我的页面</h2>
+                <div class="phone-frame">
+                    <div class="notch"></div>
+                    <iframe src="profile.html"></iframe>
+                </div>
+            </div>
+            
+            <!-- 首次登录引导页 -->
+            <div class="flex flex-col items-center">
+                <h2 class="text-xl font-semibold mb-4">首次登录引导页</h2>
+                <div class="phone-frame">
+                    <div class="notch"></div>
+                    <iframe src="onboarding.html"></iframe>
+                </div>
+            </div>
+            
+            <!-- OOTD生成弹窗 -->
+            <div class="flex flex-col items-center">
+                <h2 class="text-xl font-semibold mb-4">OOTD生成弹窗</h2>
+                <div class="phone-frame">
+                    <div class="notch"></div>
+                    <iframe src="ootd_popup.html"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

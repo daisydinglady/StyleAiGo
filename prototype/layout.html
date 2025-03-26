@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天气+OOTD小程序</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .status-bar {
+            height: 44px;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-bottom: 1px solid #eaeaea;
+        }
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 70px;
+        }
+        .tab-bar {
+            height: 60px;
+            background-color: #ffffff;
+            border-top: 1px solid #eaeaea;
+            display: flex;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            box-shadow: 0 -1px 5px rgba(0,0,0,0.05);
+        }
+        .tab {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+        }
+        .tab.active {
+            color: #3B82F6;
+        }
+        .tab-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        .tab-text {
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-bar">
+        <h1 class="text-base font-medium" id="page-title">页面标题</h1>
+    </div>
+    
+    <div class="content" id="content">
+        <!-- 页面内容将在这里动态插入 -->
+    </div>
+    
+    <div class="tab-bar">
+        <a href="ootd.html" class="tab" id="tab-ootd">
+            <div class="tab-icon"><i class="fas fa-tshirt"></i></div>
+            <div class="tab-text">OOTD</div>
+        </a>
+        <a href="wardrobe.html" class="tab" id="tab-wardrobe">
+            <div class="tab-icon"><i class="fas fa-box-open"></i></div>
+            <div class="tab-text">智衣橱</div>
+        </a>
+        <a href="profile.html" class="tab" id="tab-profile">
+            <div class="tab-icon"><i class="fas fa-user"></i></div>
+            <div class="tab-text">我的</div>
+        </a>
+    </div>
+
+    <script>
+        // 获取当前页面名称并高亮对应的标签
+        const pagePath = window.location.pathname;
+        const pageName = pagePath.split('/').pop();
+        
+        if (pageName.includes('ootd')) {
+            document.getElementById('tab-ootd').classList.add('active');
+            document.getElementById('page-title').textContent = 'OOTD';
+        } else if (pageName.includes('wardrobe')) {
+            document.getElementById('tab-wardrobe').classList.add('active');
+            document.getElementById('page-title').textContent = '智衣橱';
+        } else if (pageName.includes('profile')) {
+            document.getElementById('tab-profile').classList.add('active');
+            document.getElementById('page-title').textContent = '我的';
+        }
+    </script>
+</body>
+</html> 
