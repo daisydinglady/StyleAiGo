@@ -1,9 +1,332 @@
 /**index.wxss**/
 page {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  background-color: #f7f7f7;
+  color: #333;
+  margin: 0;
+  padding: 0;
   height: 100vh;
   display: flex;
   flex-direction: column;
 }
+
+.status-bar {
+  height: 44px;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-bottom: 1px solid #eaeaea;
+  padding-top: constant(safe-area-inset-top); /* iOS 11.0 */
+  padding-top: env(safe-area-inset-top); /* iOS 11.2+ */
+}
+
+.text-base {
+  font-size: 16px;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: calc(65px + constant(safe-area-inset-bottom)); /* iOS 11.0 */
+  padding-bottom: calc(65px + env(safe-area-inset-bottom)); /* iOS 11.2+ */
+}
+
+.tab-bar {
+  height: 55px;
+  background-color: #ffffff;
+  border-top: 1px solid #eaeaea;
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.05);
+  z-index: 1000;
+  padding-bottom: constant(safe-area-inset-bottom); /* iOS 11.0 */
+  padding-bottom: env(safe-area-inset-bottom); /* iOS 11.2+ */
+}
+
+/* 适配不同设备的屏幕尺寸 */
+@media screen and (max-width: 320px) {
+  .tab-icon {
+    font-size: 20px;
+  }
+
+  .tab-text {
+    font-size: 11px;
+  }
+
+  .temperature {
+    font-size: 64px;
+  }
+
+  .weather-condition {
+    font-size: 22px;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .weather-container,
+  .forecast-container,
+  .style-container {
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  padding: 5px 0;
+}
+
+.tab.active {
+  color: #3b82f6;
+}
+
+.tab-icon {
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.tab-text {
+  font-size: 12px;
+  line-height: 1.2;
+  text-align: center;
+  width: 100%;
+  display: block;
+  padding: 0 2px;
+}
+
+/* 天气容器样式 */
+.weather-container {
+  margin: 16px;
+  padding: 16px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.location-date {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.location {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.date {
+  font-size: 14px;
+  color: #666;
+}
+
+.current-weather {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.left-weather-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.right-weather-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 20px;
+}
+
+.temp-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.temperature {
+  font-size: 72px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.weather-condition {
+  font-size: 24px;
+  color: #333;
+  margin-top: 4px;
+}
+
+.weather-icon-large {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.weather-icon-large image {
+  width: 100%;
+  height: 100%;
+}
+
+.weather-icon-large text {
+  font-size: 64px;
+}
+
+.temp-range {
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+}
+
+.weather-details {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 16px;
+}
+
+.weather-detail-item {
+  font-size: 16px;
+  color: #666;
+}
+
+/* 七日天气预报样式 */
+.forecast-container {
+  margin: 16px;
+  padding: 16px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.forecast-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.forecast-list {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding-bottom: 8px;
+}
+
+.forecast-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: calc(100% / 7 - 5px);
+}
+
+.day {
+  font-size: 12px;
+  margin-bottom: 8px;
+  text-align: center;
+  min-height: 32px; /* 固定高度，确保下周标签不会导致错位 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.weather-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.high-temp {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.low-temp {
+  font-size: 14px;
+  color: #999;
+}
+
+/* 穿搭风格样式 */
+.style-container {
+  margin: 16px;
+  padding: 16px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.style-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.style-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.style-option {
+  background-color: #f0f0f0;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  color: #333;
+}
+
+.style-option.selected {
+  background-color: #4285f4;
+  color: white;
+}
+
+.generate-ootd-btn {
+  width: 100%;
+  background-color: #4285f4;
+  color: white;
+  font-size: 16px;
+  padding: 0;
+  border-radius: 24px;
+  border: none;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  line-height: 1;
+  box-sizing: border-box;
+}
+
+/* 适配iPhone X及以上机型底部安全区域 */
+@supports (padding-bottom: constant(safe-area-inset-bottom)) or
+  (padding-bottom: env(safe-area-inset-bottom)) {
+  .generate-ootd-btn {
+    padding: 0;
+    height: calc(44px + constant(safe-area-inset-bottom));
+    height: calc(44px + env(safe-area-inset-bottom));
+  }
+}
+
 .scrollarea {
   flex: 1;
   overflow-y: hidden;
@@ -48,8 +371,8 @@ page {
   width: 100%;
   padding: 16px;
   box-sizing: border-box;
-  border-top: .5px solid rgba(0, 0, 0, 0.1);
-  border-bottom: .5px solid rgba(0, 0, 0, 0.1);
+  border-top: 0.5px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
   color: black;
 }
 

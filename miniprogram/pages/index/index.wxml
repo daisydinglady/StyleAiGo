@@ -1,27 +1,83 @@
 <!--index.wxml-->
-<scroll-view class="scrollarea" scroll-y type="list">
-  <view class="container">
-    <view class="userinfo">
-      <block wx:if="{{canIUseNicknameComp && !hasUserInfo}}">
-        <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
-          <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
-        </button>
-        <view class="nickname-wrapper">
-          <text class="nickname-label">昵称</text>
-          <input type="nickname" class="nickname-input" placeholder="请输入昵称" bind:change="onInputChange" />
-        </view>
-      </block>
-      <block wx:elif="{{!hasUserInfo}}">
-        <button wx:if="{{canIUseGetUserProfile}}" bindtap="getUserProfile"> 获取头像昵称 </button>
-        <view wx:else> 请使用2.10.4及以上版本基础库 </view>
-      </block>
-      <block wx:else>
-        <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
-        <text class="userinfo-nickname">{{userInfo.nickName}}</text>
-      </block>
+
+<scroll-view class="content" scroll-y type="list">
+  <!-- 天气信息卡片 -->
+  <view class="weather-container">
+    <view class="location-date">
+      <text class="location">{{weatherData.city}}</text>
+      <text class="date">{{weatherData.date}}</text>
     </view>
-    <view class="usermotto">
-      <text class="user-motto">{{motto}}</text>
+    <view class="current-weather">
+      <!-- 左侧温度和天气状况 -->
+      <view class="left-weather-info">
+        <view class="temp-info">
+          <text class="temperature">{{weatherData.temperature}}</text>
+          <text class="weather-condition">{{weatherData.condition}}</text>
+        </view>
+        <view class="weather-details">
+          <view class="weather-detail-item">
+            <text>🌬️ {{weatherData.wind}}</text>
+          </view>
+          <view class="weather-detail-item">
+            <text>💧 {{weatherData.humidity}}</text>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 右侧天气图标和温度范围 -->
+      <view class="right-weather-info">
+        <view class="weather-icon-large">
+          <image wx:if="{{weatherData.condition === '晴'}}" src="/images/weather/sunny.svg" mode="aspectFit"></image>
+          <text wx:else>🌞</text>
+        </view>
+        <view class="temp-range">
+          <text>{{forecastData[0].lowTemp}}~{{forecastData[0].highTemp}}</text>
+        </view>
+      </view>
     </view>
   </view>
+  
+  <!-- 七日天气预报 -->
+  <view class="forecast-container">
+    <view class="forecast-title">近7日天气</view>
+    <view class="forecast-list">
+      <view class="forecast-item" wx:for="{{forecastData}}" wx:key="day">
+        <text class="day">{{item.day}}</text>
+        <view class="weather-icon">{{item.icon}}</view>
+        <text class="high-temp">{{item.highTemp}}</text>
+        <text class="low-temp">{{item.lowTemp}}</text>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 穿搭风格选择 -->
+  <view class="style-container">
+    <view class="style-title">今日穿搭风格</view>
+    <view class="style-options">
+      <view class="style-option {{selectedStyle === item ? 'selected' : ''}}" 
+            wx:for="{{styleOptions}}" 
+            wx:key="*this"
+            bindtap="selectStyle"
+            data-index="{{index}}">
+        {{item}}
+      </view>
+    </view>
+    <button class="generate-ootd-btn" bindtap="generateOOTD">生成今日OOTD</button>
+  </view>
 </scroll-view>
+
+<!-- 底部标签栏 -->
+<view class="tab-bar">
+  <view class="tab active" bindtap="switchTab" data-page="ootd">
+    <text class="tab-icon">👚</text>
+    <text class="tab-text">OOTD</text>
+  </view>
+  <view class="tab" bindtap="switchTab" data-page="wardrobe">
+    <text class="tab-icon">👔</text>
+    <text class="tab-text">智衣橱</text>
+  </view>
+  <view class="tab" bindtap="switchTab" data-page="profile">
+    <text class="tab-icon">👤</text>
+    <text class="tab-text">我的</text>
+  </view>
+</view>

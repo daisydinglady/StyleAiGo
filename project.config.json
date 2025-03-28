@@ -1,0 +1,27 @@
+{
+  "setting": {
+    "packNpmRelationList": [],
+    "ignoreUploadUnusedFiles": true,
+    "useMultiFramework": true,
+    "minified": true,
+    "enhance": true,
+    "postcss": true,
+    "checkSiteMap": false
+  },
+  "appid": "wx123456789",
+  "projectname": "天气+OOTD",
+  "libVersion": "2.35.3",
+  "simulatorType": "wechat",
+  "simulatorPluginLibVersion": {},
+  "condition": {},
+  "srcMiniprogramRoot": "miniprogram/",
+  "compileType": "miniprogram",
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "editorSetting": {
+    "tabIndent": "insertSpaces",
+    "tabSize": 2
+  }
+} 
