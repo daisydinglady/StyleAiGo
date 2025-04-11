@@ -1,22 +1,5 @@
 <!--wardrobe.wxml-->
 <view class="container">
-  <!-- 智衣橱标题 -->
-  <view class="wardrobe-header" bindtap="showAddItemModal"> 
-    <view class="wardrobe-title">+ 添加新衣物</view>
-    <!-- <view class="add-item-btn">+</view> -->
-  </view>
-
-  <!-- 分类标签 -->
-  <scroll-view scroll-x="true" class="category-tabs">
-    <view class="category-tab {{currentCategory === 'all' ? 'active' : ''}}" bindtap="changeCategory" data-category="all">全部</view>
-    <view class="category-tab {{currentCategory === 'tops' ? 'active' : ''}}" bindtap="changeCategory" data-category="tops">上装</view>
-    <view class="category-tab {{currentCategory === 'pants' ? 'active' : ''}}" bindtap="changeCategory" data-category="pants">裤子</view>
-    <view class="category-tab {{currentCategory === 'outerwear' ? 'active' : ''}}" bindtap="changeCategory" data-category="outerwear">外套</view>
-    <view class="category-tab {{currentCategory === 'shoes' ? 'active' : ''}}" bindtap="changeCategory" data-category="shoes">鞋子</view>
-    <view class="category-tab {{currentCategory === 'accessories' ? 'active' : ''}}" bindtap="changeCategory" data-category="accessories">配饰</view>
-    <view class="category-tab {{currentCategory === 'bags' ? 'active' : ''}}" bindtap="changeCategory" data-category="bags">包包</view>
-  </scroll-view>
-
   <!-- 搜索栏 -->
   <view class="search-bar">
     <view class="search-input-container">
@@ -27,6 +10,24 @@
       <image src="/miniprogram/images/wardrobe/filter.png" mode="aspectFit" class="filter-icon"></image>
     </view>
   </view>
+
+  <!-- 智衣橱标题 -->
+  <view class="wardrobe-header" bindtap="showAddItemModal"> 
+    <view class="wardrobe-title">+ 添加新衣物</view>
+    <!-- <view class="add-item-btn">+</view> -->
+  </view>
+
+  <view class="wardrobe-layout">
+  <!-- 分类标签 -->
+  <scroll-view class="category-tabs">
+    <view class="category-tab {{currentCategory === 'all' ? 'active' : ''}}" bindtap="changeCategory" data-category="all">全部</view>
+    <view class="category-tab {{currentCategory === 'tops' ? 'active' : ''}}" bindtap="changeCategory" data-category="tops">上装</view>
+    <view class="category-tab {{currentCategory === 'pants' ? 'active' : ''}}" bindtap="changeCategory" data-category="pants">裤子</view>
+    <view class="category-tab {{currentCategory === 'outerwear' ? 'active' : ''}}" bindtap="changeCategory" data-category="outerwear">外套</view>
+    <view class="category-tab {{currentCategory === 'shoes' ? 'active' : ''}}" bindtap="changeCategory" data-category="shoes">鞋子</view>
+    <view class="category-tab {{currentCategory === 'accessories' ? 'active' : ''}}" bindtap="changeCategory" data-category="accessories">配饰</view>
+    <view class="category-tab {{currentCategory === 'bags' ? 'active' : ''}}" bindtap="changeCategory" data-category="bags">包包</view>
+  </scroll-view>
 
   <!-- 衣物列表 -->
   <view class="wardrobe-items">
@@ -49,6 +50,7 @@
       <button class="add-clothing-btn" bindtap="showAddItemModal">添加衣物</button>
     </view>
   </view>
+</view>
 
   <!-- 推荐穿搭部分 -->
   <view class="recommended-outfits" wx:if="{{recommendedOutfits.length > 0}}">

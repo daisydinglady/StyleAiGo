@@ -53,7 +53,7 @@ Page({
     wardrobeItems: [
       {
         id: 1,
-        name: '白色T恤',
+        name: '黑色T恤',
         category: '上装',
         image: '/miniprogram/images/wardrobe/tshirt.png',
         color: '白色',
