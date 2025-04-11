@@ -1,13 +1,43 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/logs/logs"
+    "pages/logs/logs",
+    "pages/profile/profile",
+    "pages/wardrobe/wardrobe"
   ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "天气+OOTD",
+    "navigationBarTitleText": "StyleAIgo",
     "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#999",
+    "selectedColor": "#3B82F6",
+    "backgroundColor": "#fff",
+    "borderStyle": "black",
+    "usingComponents": {},
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "OOTD",
+        "iconPath": "images/icons/weather-icon.png",
+        "selectedIconPath": "images/icons/weather-icon.png"
+      },
+      {
+        "pagePath": "pages/wardrobe/wardrobe",
+        "text": "智衣橱",
+        "iconPath": "images/icons/weather-icon.png",
+        "selectedIconPath": "images/icons/weather-icon.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "images/icons/weather-icon.png",
+        "selectedIconPath": "images/icons/weather-icon.png"
+      }
+    ]
   },
   "style": "v2",
   "componentFramework": "glass-easel",

@@ -66,18 +66,3 @@
   </view>
 </scroll-view>
 
-<!-- 底部标签栏 -->
-<view class="tab-bar">
-  <view class="tab active" bindtap="switchTab" data-page="ootd">
-    <text class="tab-icon">👚</text>
-    <text class="tab-text">OOTD</text>
-  </view>
-  <view class="tab" bindtap="switchTab" data-page="wardrobe">
-    <text class="tab-icon">👔</text>
-    <text class="tab-text">智衣橱</text>
-  </view>
-  <view class="tab" bindtap="switchTab" data-page="profile">
-    <text class="tab-icon">👤</text>
-    <text class="tab-text">我的</text>
-  </view>
-</view>

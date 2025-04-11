@@ -1,6 +1,9 @@
 // index.js
 const defaultAvatarUrl = 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0'
 
+// 获取应用实例
+const app = getApp()
+
 Page({
   data: {
     motto: 'Hello World',
@@ -348,6 +351,11 @@ Page({
 
   // 监听页面显示
   onShow() {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({
+        selected: 0
+      })
+    }
     // 每次页面显示时检查设备方向
     this.checkDeviceOrientation();
   },

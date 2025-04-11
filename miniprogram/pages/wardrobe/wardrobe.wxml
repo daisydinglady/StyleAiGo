@@ -1,0 +1,146 @@
+<!--wardrobe.wxml-->
+<view class="container">
+  <!-- 智衣橱标题 -->
+  <view class="wardrobe-header" bindtap="showAddItemModal"> 
+    <view class="wardrobe-title">+ 添加新衣物</view>
+    <!-- <view class="add-item-btn">+</view> -->
+  </view>
+
+  <!-- 分类标签 -->
+  <scroll-view scroll-x="true" class="category-tabs">
+    <view class="category-tab {{currentCategory === 'all' ? 'active' : ''}}" bindtap="changeCategory" data-category="all">全部</view>
+    <view class="category-tab {{currentCategory === 'tops' ? 'active' : ''}}" bindtap="changeCategory" data-category="tops">上装</view>
+    <view class="category-tab {{currentCategory === 'pants' ? 'active' : ''}}" bindtap="changeCategory" data-category="pants">裤子</view>
+    <view class="category-tab {{currentCategory === 'outerwear' ? 'active' : ''}}" bindtap="changeCategory" data-category="outerwear">外套</view>
+    <view class="category-tab {{currentCategory === 'shoes' ? 'active' : ''}}" bindtap="changeCategory" data-category="shoes">鞋子</view>
+    <view class="category-tab {{currentCategory === 'accessories' ? 'active' : ''}}" bindtap="changeCategory" data-category="accessories">配饰</view>
+    <view class="category-tab {{currentCategory === 'bags' ? 'active' : ''}}" bindtap="changeCategory" data-category="bags">包包</view>
+  </scroll-view>
+
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-input-container">
+      <icon type="search" size="15" color="#999"></icon>
+      <input type="text" placeholder="搜索衣物" bindinput="onSearchInput" />
+    </view>
+    <view class="filter-btn" bindtap="showFilterModal">
+      <image src="/miniprogram/images/wardrobe/filter.png" mode="aspectFit" class="filter-icon"></image>
+    </view>
+  </view>
+
+  <!-- 衣物列表 -->
+  <view class="wardrobe-items">
+    <block wx:if="{{filteredItems.length > 0}}">
+      <view class="wardrobe-grid">
+        <view wx:for="{{filteredItems}}" wx:key="id" class="wardrobe-item" bindtap="showItemDetail" data-id="{{item.id}}">
+          <view class="item-image-container">
+            <image src="{{item.image}}" mode="aspectFill" class="item-image"></image>
+          </view>
+          <view class="item-info">
+            <view class="item-name">{{item.name}}</view>
+            <view class="item-category">{{item.category}}</view>
+          </view>
+        </view>
+      </view>
+    </block>
+    <view wx:else class="empty-state">
+      <image src="/miniprogram/images/wardrobe/empty.png" mode="aspectFit" class="empty-image"></image>
+      <view class="empty-text">暂无衣物</view>
+      <button class="add-clothing-btn" bindtap="showAddItemModal">添加衣物</button>
+    </view>
+  </view>
+
+  <!-- 推荐穿搭部分 -->
+  <view class="recommended-outfits" wx:if="{{recommendedOutfits.length > 0}}">
+    <view class="section-title">推荐穿搭</view>
+    <scroll-view scroll-x="true" class="outfit-scroll">
+      <view wx:for="{{recommendedOutfits}}" wx:key="id" class="outfit-card">
+        <view class="outfit-image-container">
+          <image src="{{item.image}}" mode="aspectFill" class="outfit-image"></image>
+        </view>
+        <view class="outfit-info">
+          <view class="outfit-title">{{item.title}}</view>
+          <view class="outfit-description">{{item.description}}</view>
+        </view>
+        <view class="outfit-actions">
+          <view class="outfit-action-btn save-btn" catchtap="saveOutfit" data-id="{{item.id}}">
+            <text>保存</text>
+          </view>
+          <view class="outfit-action-btn favorite-btn {{item.isFavorite ? 'active' : ''}}" catchtap="toggleFavorite" data-id="{{item.id}}">
+            <text>{{item.isFavorite ? '已收藏' : '收藏'}}</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 添加衣物弹窗 -->
+  <view class="modal-mask" wx:if="{{showAddItemModal}}">
+    <view class="modal-content">
+      <view class="modal-header">添加衣物</view>
+      <view class="modal-body">
+        <view class="form-item">
+          <label>名称</label>
+          <input type="text" placeholder="请输入衣物名称" bindinput="onItemNameInput" value="{{newItem.name}}" />
+        </view>
+        <view class="form-item">
+          <label>类别</label>
+          <picker mode="selector" range="{{categoryOptions}}" bindchange="onCategoryChange">
+            <view class="picker-view">{{newItem.category || '请选择类别'}}</view>
+          </picker>
+        </view>
+        <view class="form-item">
+          <label>上传照片</label>
+          <view class="upload-area" bindtap="chooseImage">
+            <block wx:if="{{newItem.image}}">
+              <image src="{{newItem.image}}" mode="aspectFill" class="preview-image"></image>
+            </block>
+            <view wx:else class="upload-placeholder">
+              <text class="upload-icon">+</text>
+              <text class="upload-text">点击上传</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="modal-footer">
+        <view class="modal-btn" bindtap="hideAddItemModal">取消</view>
+        <view class="modal-btn confirm-btn" bindtap="addItem">保存</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 筛选弹窗 -->
+  <view class="modal-mask" wx:if="{{showFilterModal}}">
+    <view class="modal-content filter-modal">
+      <view class="modal-header">筛选</view>
+      <view class="modal-body">
+        <view class="filter-section">
+          <view class="filter-title">颜色</view>
+          <view class="color-options">
+            <view wx:for="{{colorOptions}}" wx:key="color" 
+                  class="color-option {{filters.colors.includes(item.color) ? 'selected' : ''}}" 
+                  style="background-color: {{item.bg}};" 
+                  bindtap="toggleColorFilter" 
+                  data-color="{{item.color}}">
+            </view>
+          </view>
+        </view>
+        <view class="filter-section">
+          <view class="filter-title">季节</view>
+          <view class="season-options">
+            <view wx:for="{{seasonOptions}}" wx:key="season" 
+                  class="season-option {{filters.seasons.includes(item.season) ? 'selected' : ''}}" 
+                  bindtap="toggleSeasonFilter" 
+                  data-season="{{item.season}}">
+              {{item.label}}
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="modal-footer">
+        <view class="modal-btn" bindtap="resetFilters">重置</view>
+        <view class="modal-btn confirm-btn" bindtap="applyFilters">应用</view>
+      </view>
+    </view>
+  </view>
+</view> 

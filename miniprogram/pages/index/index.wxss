@@ -34,6 +34,7 @@ page {
 .content {
   flex: 1;
   overflow-y: auto;
+  padding-bottom: 10px;
   padding-bottom: calc(65px + constant(safe-area-inset-bottom)); /* iOS 11.0 */
   padding-bottom: calc(65px + env(safe-area-inset-bottom)); /* iOS 11.2+ */
 }
@@ -50,8 +51,6 @@ page {
   width: 100%;
   box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.05);
   z-index: 1000;
-  padding-bottom: constant(safe-area-inset-bottom); /* iOS 11.0 */
-  padding-bottom: env(safe-area-inset-bottom); /* iOS 11.2+ */
 }
 
 /* 适配不同设备的屏幕尺寸 */
