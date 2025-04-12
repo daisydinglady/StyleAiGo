@@ -80,15 +80,95 @@ Page({
     })
   },
   onLoad() {
+    // 检查是否已完成引导
+    this.checkOnboardingStatus();
+    
     // 检测设备信息，进行适配
     this.checkDeviceInfo();
 
     // 页面加载时获取天气数据和当前日期
     this.getCurrentDate();
+    
+    // 从本地存储获取用户设置的城市
+    this.syncCityFromStorage();
+    
+    // 获取天气数据
     this.getWeatherData();
 
     // 获取用户位置
     this.getUserLocation();
+  },
+
+  // 检查是否已完成引导
+  checkOnboardingStatus() {
+    const app = getApp();
+    
+    try {
+      // 获取本地存储状态
+      const onboardingCompleted = wx.getStorageSync('onboardingCompleted');
+      const userCity = wx.getStorageSync('userCity');
+      const userGender = wx.getStorageSync('userGender');
+      const userPersonalDescription = wx.getStorageSync('userPersonalDescription');
+      
+      // 如果已明确标记为完成引导，直接返回，防止循环跳转
+      if (onboardingCompleted === 'true') {
+        console.log('已明确标记为完成引导，无需跳转');
+        // 确保全局状态也标记为已完成
+        app.globalData.onboardingCompleted = true;
+        return;
+      }
+      
+      console.log('引导状态检查:', {
+        onboardingCompleted,
+        userCity,
+        userGender,
+        userPersonalDescription,
+        globalCompleted: app.globalData.onboardingCompleted
+      });
+      
+      // 如果有任何一项有值，也标记为完成引导
+      if (userCity || userGender || userPersonalDescription) {
+        console.log('发现用户数据，标记为已完成引导');
+        this.saveToStorage('onboardingCompleted', 'true');
+        app.globalData.onboardingCompleted = true;
+        return;
+      }
+      
+      // 只有在明确未完成引导时才跳转
+      if (!app.globalData.onboardingCompleted && !onboardingCompleted) {
+        console.log('需要跳转到引导页面');
+        
+        // 跳转到引导页
+        wx.redirectTo({
+          url: '/pages/onboarding/onboarding',
+          success: (res) => {
+            console.log('跳转成功', res);
+          },
+          fail: (err) => {
+            console.error('跳转失败', err);
+            // 尝试使用相对路径
+            console.log('尝试使用相对路径跳转');
+            wx.redirectTo({
+              url: '../onboarding/onboarding'
+            });
+          }
+        });
+      } else {
+        console.log('已完成引导，无需跳转');
+      }
+    } catch (e) {
+      console.error('检查引导状态失败:', e);
+    }
+  },
+  
+  // 保存到本地存储
+  saveToStorage: function(key, value) {
+    try {
+      wx.setStorageSync(key, value);
+      console.log(`保存数据成功: ${key} = ${value}`);
+    } catch (e) {
+      console.error(`保存数据失败: ${key}`, e);
+    }
   },
 
   // 检测设备信息，进行适配
@@ -123,144 +203,6 @@ Page({
     } catch (e) {
       console.error('获取设备信息失败:', e);
     }
-  },
-
-  // 获取用户位置
-  getUserLocation() {
-    wx.getLocation({
-      type: 'gcj02',
-      success: (res) => {
-        const latitude = res.latitude;
-        const longitude = res.longitude;
-        console.log('当前位置:', latitude, longitude);
-
-        // 根据经纬度获取城市信息
-        this.getCityFromLocation(latitude, longitude);
-      },
-      fail: (err) => {
-        console.error('获取位置失败:', err);
-        // 获取失败时使用默认城市
-        this.setData({
-          'weatherData.city': '北京市'
-        });
-      }
-    });
-  },
-
-  // 根据经纬度获取城市信息
-  getCityFromLocation(latitude, longitude) {
-    // 可以调用微信的逆地址解析API或其他第三方地图API
-    // 这里使用模拟数据
-    /*
-    wx.request({
-      url: 'https://api.map.baidu.com/reverse_geocoding/v3',
-      data: {
-        ak: 'YOUR_BAIDU_MAP_KEY',
-        location: `${latitude},${longitude}`,
-        output: 'json'
-      },
-      success: (res) => {
-        if (res.data && res.data.result && res.data.result.addressComponent) {
-          const city = res.data.result.addressComponent.city;
-          this.setData({
-            'weatherData.city': city
-          });
-          
-          // 获取该城市的天气数据
-          this.getWeatherData(city);
-        }
-      },
-      fail: (err) => {
-        console.error('获取城市信息失败:', err);
-      }
-    });
-    */
-
-    // 模拟数据
-    setTimeout(() => {
-      this.setData({
-        'weatherData.city': '深圳市'
-      });
-    }, 1000);
-  },
-
-  switchTab(e) {
-    const page = e.currentTarget.dataset.page;
-    console.log('切换到页面:', page);
-
-    if (page === 'ootd') {
-      // 当前页面，不需要跳转
-      this.setData({
-        currentPage: 'ootd'
-      });
-    } else if (page === 'wardrobe') {
-      // 跳转到智衣橱页面
-      wx.navigateTo({
-        url: '../wardrobe/wardrobe'
-      });
-    } else if (page === 'profile') {
-      // 跳转到个人页面
-      wx.navigateTo({
-        url: '../profile/profile'
-      });
-    }
-  },
-
-  // 选择穿搭风格
-  selectStyle(e) {
-    const index = e.currentTarget.dataset.index;
-    const style = this.data.styleOptions[index];
-
-    this.setData({
-      selectedStyle: style
-    });
-  },
-
-  // 生成今日OOTD
-  generateOOTD() {
-    if (!this.data.selectedStyle) {
-      wx.showToast({
-        title: '请先选择穿搭风格',
-        icon: 'none'
-      });
-      return;
-    }
-
-    // 跳转到生成结果页面或进行其他操作
-    wx.navigateTo({
-      url: '../result/result?style=' + this.data.selectedStyle
-    });
-  },
-
-  // 获取天气数据
-  getWeatherData(city) {
-    // 真实应用中应调用天气API
-    // 这里使用模拟数据
-    console.log('获取天气数据, 城市:', city || this.data.weatherData.city);
-
-    // 可以使用wx.request调用实际API
-    /*
-    wx.request({
-      url: 'weather-api-url',
-      data: {
-        city: city || this.data.weatherData.city
-      },
-      success: (res) => {
-        // 处理返回数据
-        this.setData({
-          weatherData: {
-            city: city || this.data.weatherData.city,
-            date: this.getCurrentDate(),
-            temperature: res.data.temperature,
-            condition: res.data.condition,
-            wind: res.data.wind,
-            humidity: res.data.humidity
-          },
-          forecastData: res.data.forecast
-        });
-      }
-    });
-    */
   },
 
   // 获取当前日期和星期，同时更新七日天气预报
@@ -351,10 +293,16 @@ Page({
 
   // 监听页面显示
   onShow() {
+    // 每次显示页面时都同步城市设置
+    this.syncCityFromStorage();
+    
+    // 更新天气数据
+    this.getWeatherData();
+    
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({
         selected: 0
-      })
+      });
     }
     // 每次页面显示时检查设备方向
     this.checkDeviceOrientation();
@@ -371,5 +319,183 @@ Page({
   // 错误处理
   onError(err) {
     console.error('页面发生错误:', err);
-  }
+  },
+
+  // 从本地存储同步城市设置
+  syncCityFromStorage() {
+    try {
+      const userCity = wx.getStorageSync('userCity');
+      console.log('从本地存储读取到城市:', userCity);
+      
+      // 如果有设置城市，更新天气卡片中的城市
+      if (userCity) {
+        this.setData({
+          'weatherData.city': userCity
+        });
+        console.log('天气卡片城市已更新为:', userCity);
+      }
+    } catch (e) {
+      console.error('同步城市设置失败:', e);
+    }
+  },
+
+  // 获取用户位置
+  getUserLocation() {
+    // 检查是否开启了自动定位
+    const autoLocation = wx.getStorageSync('autoLocation');
+    console.log('自动定位设置:', autoLocation);
+    
+    // 如果明确关闭了自动定位，则使用用户设置的城市
+    if (autoLocation === 'false') {
+      console.log('自动定位已关闭，使用用户设置的城市');
+      return;
+    }
+    
+    wx.getLocation({
+      type: 'gcj02',
+      success: (res) => {
+        const latitude = res.latitude;
+        const longitude = res.longitude;
+        console.log('当前位置:', latitude, longitude);
+
+        // 根据经纬度获取城市信息
+        this.getCityFromLocation(latitude, longitude);
+      },
+      fail: (err) => {
+        console.error('获取位置失败:', err);
+        // 获取失败时使用用户设置的城市或默认城市
+        const userCity = wx.getStorageSync('userCity');
+        this.setData({
+          'weatherData.city': userCity || '北京市'
+        });
+      }
+    });
+  },
+
+  // 根据经纬度获取城市信息
+  getCityFromLocation(latitude, longitude) {
+    // 可以调用微信的逆地址解析API或其他第三方地图API
+    // 这里使用模拟数据
+    /*
+    wx.request({
+      url: 'https://api.map.baidu.com/reverse_geocoding/v3',
+      data: {
+        ak: 'YOUR_BAIDU_MAP_KEY',
+        location: `${latitude},${longitude}`,
+        output: 'json'
+      },
+      success: (res) => {
+        if (res.data && res.data.result && res.data.result.addressComponent) {
+          const city = res.data.result.addressComponent.city;
+          
+          // 检查自动定位是否开启
+          const autoLocation = wx.getStorageSync('autoLocation');
+          if (autoLocation !== 'false') {
+            this.setData({
+              'weatherData.city': city
+            });
+            
+            // 获取该城市的天气数据
+            this.getWeatherData(city);
+          }
+        }
+      },
+      fail: (err) => {
+        console.error('获取城市信息失败:', err);
+      }
+    });
+    */
+
+    // 模拟数据
+    setTimeout(() => {
+      // 检查自动定位是否开启
+      const autoLocation = wx.getStorageSync('autoLocation');
+      if (autoLocation !== 'false') {
+        const locationCity = '深圳市';
+        this.setData({
+          'weatherData.city': locationCity
+        });
+        console.log('位置已更新为:', locationCity);
+      }
+    }, 1000);
+  },
+
+  switchTab(e) {
+    const page = e.currentTarget.dataset.page;
+    console.log('切换到页面:', page);
+
+    if (page === 'ootd') {
+      // 当前页面，不需要跳转
+      this.setData({
+        currentPage: 'ootd'
+      });
+    } else if (page === 'wardrobe') {
+      // 跳转到智衣橱页面
+      wx.navigateTo({
+        url: '../wardrobe/wardrobe'
+      });
+    } else if (page === 'profile') {
+      // 跳转到个人页面
+      wx.navigateTo({
+        url: '../profile/profile'
+      });
+    }
+  },
+
+  // 选择穿搭风格
+  selectStyle(e) {
+    const index = e.currentTarget.dataset.index;
+    const style = this.data.styleOptions[index];
+
+    this.setData({
+      selectedStyle: style
+    });
+  },
+
+  // 生成今日OOTD
+  generateOOTD() {
+    if (!this.data.selectedStyle) {
+      wx.showToast({
+        title: '请先选择穿搭风格',
+        icon: 'none'
+      });
+      return;
+    }
+
+    // 跳转到生成结果页面或进行其他操作
+    wx.navigateTo({
+      url: '../result/result?style=' + this.data.selectedStyle
+    });
+  },
+
+  // 获取天气数据
+  getWeatherData(city) {
+    // 真实应用中应调用天气API
+    // 这里使用模拟数据
+    console.log('获取天气数据, 城市:', city || this.data.weatherData.city);
+
+    // 可以使用wx.request调用实际API
+    /*
+    wx.request({
+      url: 'weather-api-url',
+      data: {
+        city: city || this.data.weatherData.city
+      },
+      success: (res) => {
+        // 处理返回数据
+        this.setData({
+          weatherData: {
+            city: city || this.data.weatherData.city,
+            date: this.getCurrentDate(),
+            temperature: res.data.temperature,
+            condition: res.data.condition,
+            wind: res.data.wind,
+            humidity: res.data.humidity
+          },
+          forecastData: res.data.forecast
+        });
+      }
+    });
+    */
+  },
 })

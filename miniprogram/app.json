@@ -3,7 +3,8 @@
     "pages/index/index",
     "pages/logs/logs",
     "pages/profile/profile",
-    "pages/wardrobe/wardrobe"
+    "pages/wardrobe/wardrobe",
+    "pages/onboarding/onboarding"
   ],
   "window": {
     "backgroundTextStyle": "light",

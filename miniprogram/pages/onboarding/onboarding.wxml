@@ -1,0 +1,113 @@
+<!--onboarding.wxml-->
+<view class="container">
+  <view class="status-bar">
+    <text class="status-title">设置你的个人信息</text>
+  </view>
+  
+  <view class="content">
+    <!-- 第一步：欢迎页面 -->
+    <view class="onboarding-page {{currentPage === 1 ? '' : 'hidden'}}" id="page-1">
+      <view class="onboarding-header">
+        <text class="welcome-emoji">✨</text>
+        <text class="onboarding-title">欢迎使用天气+OOTD</text>
+        <text class="onboarding-subtitle">开始你的智能穿搭之旅</text>
+      </view>
+      
+      <text class="intro-text">
+        为了给你提供更准确的穿搭建议，
+        我们需要收集一些基本信息
+      </text>
+      
+      <view class="button-wrapper">
+        <button class="primary-button" bindtap="goToPage" data-page="2">开始设置</button>
+      </view>
+    </view>
+    
+    <!-- 第二步：城市选择 -->
+    <view class="onboarding-page {{currentPage === 2 ? '' : 'hidden'}}" id="page-2">
+      <view class="onboarding-header">
+        <text class="onboarding-title">你在哪个城市？</text>
+        <text class="onboarding-subtitle">这将帮助我们获取准确的天气信息</text>
+      </view>
+      
+      <view class="form-group">
+        <label class="form-label">所在城市</label>
+        <view class="input-container">
+          <input type="text" class="form-input" placeholder="例如：北京、上海、广州..." bindinput="onCityInput" value="{{userInfo.city}}"/>
+          <view class="location-button" bindtap="getLocation">
+            <text class="location-icon">📍</text>
+          </view>
+        </view>
+        <text class="hint-text">
+          你可以点击定位图标获取当前位置
+        </text>
+      </view>
+      
+      <view class="bottom-nav">
+        <view class="progress-dots">
+          <view class="progress-dot"></view>
+          <view class="progress-dot active"></view>
+          <view class="progress-dot"></view>
+        </view>
+        <button class="primary-button" bindtap="goToPage" data-page="3">下一步</button>
+        <view class="skip-button" bindtap="goToPage" data-page="3">
+          稍后设置
+        </view>
+      </view>
+    </view>
+    
+    <!-- 第三步：性别选择 -->
+    <view class="onboarding-page {{currentPage === 3 ? '' : 'hidden'}}" id="page-3">
+      <view class="onboarding-header">
+        <text class="onboarding-title">选择你的性别</text>
+        <text class="onboarding-subtitle">帮助我们提供更适合你的穿搭风格</text>
+      </view>
+      
+      <view class="form-group">
+        <view class="gender-selector">
+          <view class="gender-option {{selectedGender === 'male' ? 'selected' : ''}}" bindtap="selectGender" data-gender="male">
+            <view class="gender-icon male-icon">
+              <text>👨</text>
+            </view>
+            <view class="gender-text">男生</view>
+          </view>
+          <view class="gender-option {{selectedGender === 'female' ? 'selected' : ''}}" bindtap="selectGender" data-gender="female">
+            <view class="gender-icon female-icon">
+              <text>👩</text>
+            </view>
+            <view class="gender-text">女生</view>
+          </view>
+        </view>
+      </view>
+      
+      <view class="bottom-nav">
+        <view class="progress-dots">
+          <view class="progress-dot"></view>
+          <view class="progress-dot"></view>
+          <view class="progress-dot active"></view>
+        </view>
+        <button class="primary-button" bindtap="goToPage" data-page="4">下一步</button>
+        <view class="skip-button" bindtap="goToPage" data-page="4">
+          稍后设置
+        </view>
+      </view>
+    </view>
+    
+    <!-- 第四步：个人描述 -->
+    <view class="onboarding-page {{currentPage === 4 ? '' : 'hidden'}}" id="page-4">
+      <view class="onboarding-header">
+        <text class="onboarding-title">完善你的个人信息</text>
+        <text class="onboarding-subtitle">帮助我们了解你的穿搭喜好</text>
+      </view>
+      
+      <view class="form-group">
+        <label class="form-label">个人描述</label>
+        <textarea class="form-input description-input" placeholder="描述你的穿衣风格、喜好或特点..." bindinput="onDescriptionInput" value="{{userInfo.personalDescription}}"></textarea>
+      </view>
+      
+      <view class="bottom-nav">
+        <button class="primary-button" bindtap="finishOnboarding">开始使用</button>
+      </view>
+    </view>
+  </view>
+</view> 

@@ -32,15 +32,54 @@ Page({
   },
 
   onLoad: function(options) {
-    // 页面加载时获取用户信息
-    // 实际应用中应该从服务器获取数据
+    console.log('profile页面加载');
+    // 强制从本地存储获取最新用户信息
+    this.forceUpdateUserInfo();
   },
 
   onShow: function() {
+    console.log('profile页面显示');
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({
         selected: 2
-      })
+      });
+    }
+    
+    // 每次显示页面时强制从本地存储获取最新数据
+    this.forceUpdateUserInfo();
+  },
+  
+  // 从本地存储获取用户信息
+  forceUpdateUserInfo: function() {
+    console.log('强制更新用户信息');
+    
+    // 直接从本地存储读取数据
+    try {
+      const city = wx.getStorageSync('userCity');
+      const gender = wx.getStorageSync('userGender');
+      const description = wx.getStorageSync('userPersonalDescription');
+      
+      console.log('读取到的本地数据:', { city, gender, description });
+      
+      // 构建新的用户信息对象
+      const userInfo = {
+        avatar: '', // 默认为空
+        username: '时尚达人',
+        description: description || 'AI为你的每日穿搭提供灵感',
+        city: city || '未设置',
+        gender: gender || '未设置',
+        bodyType: '未设置',
+        personalDescription: description || '添加个人描述...'
+      };
+      
+      // 强制更新数据
+      this.setData({
+        userInfo: userInfo
+      });
+      
+      console.log('用户信息已更新为:', userInfo);
+    } catch (e) {
+      console.error('强制更新用户信息失败', e);
     }
   },
 
@@ -110,14 +149,48 @@ Page({
     const modals = {...this.data.modals};
     
     if (modalType === 'cityModal') {
+      // 检查城市是否有变化
+      const oldCity = userInfo.city;
       userInfo.city = this.data.tempInputs.city;
+      
+      // 保存到本地存储
+      this.saveToStorage('userCity', userInfo.city);
+      console.log('保存城市:', userInfo.city);
+      
+      // 如果城市发生变化，发布一个全局事件
+      if (oldCity !== userInfo.city) {
+        // 更新首页的天气城市
+        try {
+          const pages = getCurrentPages();
+          for (let i = 0; i < pages.length; i++) {
+            if (pages[i].route === 'pages/index/index') {
+              // 找到首页，更新其天气城市
+              pages[i].setData({
+                'weatherData.city': userInfo.city
+              });
+              console.log('已更新首页的天气城市为:', userInfo.city);
+              break;
+            }
+          }
+        } catch (e) {
+          console.error('更新首页天气城市失败:', e);
+        }
+      }
     } else if (modalType === 'genderModal') {
       userInfo.gender = this.data.tempInputs.gender;
+      // 保存到本地存储
+      this.saveToStorage('userGender', userInfo.gender);
+      console.log('保存性别:', userInfo.gender);
     } else if (modalType === 'descriptionModal') {
       userInfo.personalDescription = this.data.tempInputs.description;
       userInfo.description = this.data.tempInputs.description;
+      // 保存到本地存储
+      this.saveToStorage('userPersonalDescription', userInfo.personalDescription);
+      console.log('保存个人描述:', userInfo.personalDescription);
     } else if (modalType === 'temperatureUnitModal') {
       settings.temperatureUnit = this.data.tempInputs.temperatureUnit;
+      // 保存到本地存储
+      this.saveToStorage('temperatureUnit', settings.temperatureUnit);
     }
     
     modals[modalType] = false;
@@ -128,7 +201,24 @@ Page({
       modals
     });
     
-    // 实际应用中应该将更新后的数据同步到服务器
+    // 更新全局数据
+    try {
+      const app = getApp();
+      if (app.globalData && app.globalData.userInfo) {
+        if (modalType === 'cityModal') {
+          app.globalData.userInfo.city = userInfo.city;
+        } else if (modalType === 'genderModal') {
+          app.globalData.userInfo.gender = userInfo.gender;
+        } else if (modalType === 'descriptionModal') {
+          app.globalData.userInfo.description = userInfo.description;
+          app.globalData.userInfo.personalDescription = userInfo.personalDescription;
+        }
+        console.log('已更新全局数据:', app.globalData.userInfo);
+      }
+    } catch(e) {
+      console.error('更新全局数据失败:', e);
+    }
+    
     wx.showToast({
       title: '保存成功',
       icon: 'success',
@@ -142,7 +232,9 @@ Page({
     settings.pushNotifications = e.detail.value;
     this.setData({ settings });
     
-    // 实际应用中应该将更新后的数据同步到服务器
+    // 保存到本地存储
+    this.saveToStorage('pushNotifications', settings.pushNotifications.toString());
+    
     wx.showToast({
       title: settings.pushNotifications ? '已开启通知' : '已关闭通知',
       icon: 'success',
@@ -156,12 +248,38 @@ Page({
     settings.autoLocation = e.detail.value;
     this.setData({ settings });
     
+    // 保存到本地存储
+    this.saveToStorage('autoLocation', settings.autoLocation.toString());
+    
     if (settings.autoLocation) {
+      // 开启自动定位时，获取位置并更新天气城市
       wx.getLocation({
         type: 'wgs84',
         success: (res) => {
           // 使用经纬度获取城市，实际应用中需要调用地理位置API
           console.log("位置获取成功", res);
+          
+          // 这里应该使用地理位置API获取城市名称
+          // 为了演示，我们使用一个模拟城市
+          const locationCity = '深圳市';
+          
+          // 更新首页的天气城市
+          try {
+            const pages = getCurrentPages();
+            for (let i = 0; i < pages.length; i++) {
+              if (pages[i].route === 'pages/index/index') {
+                // 找到首页，更新其天气城市
+                pages[i].setData({
+                  'weatherData.city': locationCity
+                });
+                console.log('自动定位已开启，更新首页的天气城市为:', locationCity);
+                break;
+              }
+            }
+          } catch (e) {
+            console.error('更新首页天气城市失败:', e);
+          }
+          
           wx.showToast({
             title: '已获取位置',
             icon: 'success',
@@ -179,14 +297,56 @@ Page({
           this.setData({
             'settings.autoLocation': false
           });
+          // 更新本地存储
+          this.saveToStorage('autoLocation', 'false');
         }
       });
     } else {
+      // 关闭自动定位时，使用用户设置的城市
+      try {
+        const userCity = wx.getStorageSync('userCity') || this.data.userInfo.city;
+        
+        // 更新首页的天气城市
+        const pages = getCurrentPages();
+        for (let i = 0; i < pages.length; i++) {
+          if (pages[i].route === 'pages/index/index') {
+            // 找到首页，更新其天气城市
+            pages[i].setData({
+              'weatherData.city': userCity
+            });
+            console.log('自动定位已关闭，更新首页的天气城市为用户设置:', userCity);
+            break;
+          }
+        }
+      } catch (e) {
+        console.error('更新首页天气城市失败:', e);
+      }
+      
       wx.showToast({
         title: '已关闭自动定位',
         icon: 'success',
         duration: 2000
       });
+    }
+  },
+
+  // 保存到本地存储
+  saveToStorage: function(key, value) {
+    try {
+      wx.setStorageSync(key, value);
+      console.log(`保存数据成功: ${key} = ${value}`);
+      
+      // 立即验证数据是否已正确保存
+      const savedValue = wx.getStorageSync(key);
+      console.log(`验证保存的数据: ${key} = ${savedValue}`);
+      
+      if(savedValue !== value) {
+        console.error(`数据保存不一致: 期望 ${value}, 实际 ${savedValue}`);
+        // 再次尝试保存
+        wx.setStorageSync(key, value);
+      }
+    } catch (e) {
+      console.error(`保存数据失败: ${key}`, e);
     }
   },
 
@@ -230,14 +390,42 @@ Page({
     wx.showModal({
       title: '提示',
       content: '确定要退出登录吗？',
-      success: function(res) {
+      success: (res) => {
         if (res.confirm) {
-          // 实际应用中应该清除本地登录状态并跳转到登录页
+          // 清除本地存储中的用户信息
+          try {
+            wx.removeStorageSync('userCity');
+            wx.removeStorageSync('userGender');
+            wx.removeStorageSync('userPersonalDescription');
+            wx.removeStorageSync('onboardingCompleted');
+            
+            console.log('已清除本地存储数据');
+          } catch (e) {
+            console.error('清除本地存储失败', e);
+          }
+          
           wx.showToast({
             title: '已退出登录',
             icon: 'success',
             duration: 2000
           });
+          
+          // 跳转到引导页
+          setTimeout(() => {
+            wx.redirectTo({
+              url: '/pages/onboarding/onboarding',
+              success: (res) => {
+                console.log('跳转到引导页成功', res);
+              },
+              fail: (err) => {
+                console.error('跳转到引导页失败', err);
+                // 备用跳转方式
+                wx.redirectTo({
+                  url: '../onboarding/onboarding'
+                });
+              }
+            });
+          }, 2000);
         }
       }
     });
