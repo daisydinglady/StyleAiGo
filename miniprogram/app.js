@@ -10,8 +10,12 @@ App({
   },
   onLaunch() {
     console.log('应用启动');
+    
     // 检查是否完成引导
     this.checkOnboardingStatus();
+    
+    // 获取用户信息
+    this.initUserInfo();
     
     // 展示本地存储能力
     const logs = wx.getStorageSync('logs') || []
@@ -25,45 +29,60 @@ App({
         console.log('登录成功', res);
       }
     })
-    
-    // 获取用户信息
-    this.initUserInfo();
   },
   
   // 检查是否已完成引导
   checkOnboardingStatus() {
     try {
+      // 首先从本地存储中读取状态标记
       const onboardingCompleted = wx.getStorageSync('onboardingCompleted');
+      
+      // 直接检查userData对象，确保和onboarding.js保存的格式一致
+      const userData = wx.getStorageSync('userData');
+      
+      // 读取独立的数据项作为备份检查
       const userCity = wx.getStorageSync('userCity');
       const userGender = wx.getStorageSync('userGender');
       const userPersonalDescription = wx.getStorageSync('userPersonalDescription');
       
       console.log('全局引导状态检查:', {
         onboardingCompleted,
+        userData,
         userCity,
         userGender,
         userPersonalDescription
       });
       
-      // 如果明确标记为已完成引导，直接设置为true
+      // 检查引导完成状态标记
       if (onboardingCompleted === 'true') {
         this.globalData.onboardingCompleted = true;
         console.log('已明确标记为完成引导');
-      } 
-      // 如果有任何一项用户数据，也视为已完成引导
-      else if (userCity || userGender || userPersonalDescription) {
-        this.globalData.onboardingCompleted = true;
-        // 补充设置完成标记，避免后续重复检查
-        wx.setStorageSync('onboardingCompleted', 'true');
-        console.log('根据用户数据判定已完成引导，并设置完成标记');
-      }
-      // 否则设置为未完成引导
-      else {
-        this.globalData.onboardingCompleted = false;
-        console.log('未完成引导');
+        return;
       }
       
-      console.log('设置全局引导状态:', this.globalData.onboardingCompleted);
+      // 检查userData对象
+      if (userData && userData.onboardingCompleted === true) {
+        this.globalData.onboardingCompleted = true;
+        // 同步设置标准标记，确保其他检查也能通过
+        wx.setStorageSync('onboardingCompleted', 'true');
+        console.log('通过userData检测到已完成引导');
+        return;
+      }
+      
+      // 检查单独的用户数据项
+      if (userCity || userGender || userPersonalDescription) {
+        this.globalData.onboardingCompleted = true;
+        // 设置完成标记，确保一致性
+        wx.setStorageSync('onboardingCompleted', 'true');
+        console.log('根据用户数据判定已完成引导，并设置完成标记');
+        return;
+      }
+      
+      // 如果以上所有检查都未通过，则设置为未完成引导
+      this.globalData.onboardingCompleted = false;
+      console.log('未检测到任何引导完成标记或用户数据，设置为未完成引导');
+      
+      console.log('最终全局引导状态:', this.globalData.onboardingCompleted);
     } catch (e) {
       console.error('检查引导状态失败:', e);
       // 出错时默认为未完成引导

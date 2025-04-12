@@ -80,7 +80,9 @@ Page({
     })
   },
   onLoad() {
-    // 检查是否已完成引导
+    console.log('首页加载中...');
+    
+    // 检查引导状态
     this.checkOnboardingStatus();
     
     // 检测设备信息，进行适配
@@ -98,64 +100,43 @@ Page({
     // 获取用户位置
     this.getUserLocation();
   },
-
-  // 检查是否已完成引导
+  
+  // 检查是否需要跳转到引导页
   checkOnboardingStatus() {
-    const app = getApp();
-    
     try {
-      // 获取本地存储状态
+      // 检查本地存储中的引导完成标记
       const onboardingCompleted = wx.getStorageSync('onboardingCompleted');
+      console.log('引导完成状态检查:', onboardingCompleted);
+      
+      // 从全局状态获取引导完成状态
+      const app = getApp();
+      const globalStatus = app.globalData.onboardingCompleted;
+      console.log('全局引导状态:', globalStatus);
+      
+      // 如果本地存储或全局状态中已标记为完成引导，则不跳转
+      if (onboardingCompleted === 'true' || globalStatus === true) {
+        console.log('引导已完成，不需要跳转');
+        return;
+      }
+      
+      // 检查是否有任何用户数据，如果有，也视为已完成引导
       const userCity = wx.getStorageSync('userCity');
       const userGender = wx.getStorageSync('userGender');
       const userPersonalDescription = wx.getStorageSync('userPersonalDescription');
       
-      // 如果已明确标记为完成引导，直接返回，防止循环跳转
-      if (onboardingCompleted === 'true') {
-        console.log('已明确标记为完成引导，无需跳转');
-        // 确保全局状态也标记为已完成
-        app.globalData.onboardingCompleted = true;
-        return;
-      }
-      
-      console.log('引导状态检查:', {
-        onboardingCompleted,
-        userCity,
-        userGender,
-        userPersonalDescription,
-        globalCompleted: app.globalData.onboardingCompleted
-      });
-      
-      // 如果有任何一项有值，也标记为完成引导
       if (userCity || userGender || userPersonalDescription) {
-        console.log('发现用户数据，标记为已完成引导');
-        this.saveToStorage('onboardingCompleted', 'true');
+        console.log('发现用户数据，视为已完成引导');
+        // 补充设置完成标记，避免后续重复检查
+        wx.setStorageSync('onboardingCompleted', 'true');
         app.globalData.onboardingCompleted = true;
         return;
       }
       
-      // 只有在明确未完成引导时才跳转
-      if (!app.globalData.onboardingCompleted && !onboardingCompleted) {
-        console.log('需要跳转到引导页面');
-        
-        // 跳转到引导页
-        wx.redirectTo({
-          url: '/pages/onboarding/onboarding',
-          success: (res) => {
-            console.log('跳转成功', res);
-          },
-          fail: (err) => {
-            console.error('跳转失败', err);
-            // 尝试使用相对路径
-            console.log('尝试使用相对路径跳转');
-            wx.redirectTo({
-              url: '../onboarding/onboarding'
-            });
-          }
-        });
-      } else {
-        console.log('已完成引导，无需跳转');
-      }
+      console.log('未完成引导，准备跳转到引导页...');
+      // 未完成引导，跳转到引导页
+      wx.redirectTo({
+        url: '/pages/onboarding/onboarding'
+      });
     } catch (e) {
       console.error('检查引导状态失败:', e);
     }

@@ -1,224 +1,238 @@
 // onboarding.js
 Page({
   data: {
-    currentPage: 1,
-    selectedGender: null,
-    userInfo: {
-      city: '',
-      gender: '',
-      personalDescription: ''
-    }
+    city: '',
+    gender: '',
+    description: '',
+    showLocationIcon: true
   },
 
   onLoad: function() {
-    // 页面加载时初始化数据
-    // 清除之前可能存在的引导完成标记，确保完成所有步骤
-    try {
-      wx.removeStorageSync('onboardingCompleted');
-    } catch (e) {
-      console.error('清除引导标记失败', e);
-    }
-    
-    console.log('引导页面加载完成');
-  },
-
-  // 页面切换
-  goToPage: function(e) {
-    const pageNum = parseInt(e.currentTarget.dataset.page);
-    this.setData({
-      currentPage: pageNum
-    });
-    
-    // 如果是从城市页面跳转，记录城市信息
-    if (this.data.currentPage === 2 && pageNum === 3 && this.data.userInfo.city) {
-      this.saveToStorage('userCity', this.data.userInfo.city);
-      console.log('保存城市信息:', this.data.userInfo.city);
-    }
-    
-    // 如果是从性别页面跳转，记录性别信息
-    if (this.data.currentPage === 3 && pageNum === 4 && this.data.selectedGender) {
-      const genderText = this.data.selectedGender === 'male' ? '男' : '女';
+    // 检查本地是否已有用户数据
+    const userData = wx.getStorageSync('userData');
+    if (userData) {
       this.setData({
-        'userInfo.gender': genderText
+        city: userData.city || '',
+        gender: userData.gender || '',
+        description: userData.description || ''
       });
-      this.saveToStorage('userGender', genderText);
-      console.log('保存性别信息:', genderText);
     }
   },
 
-  // 性别选择
+  // 输入城市
+  inputCity: function(e) {
+    this.setData({
+      city: e.detail.value
+    });
+  },
+
+  // 选择性别
   selectGender: function(e) {
-    const gender = e.currentTarget.dataset.gender;
     this.setData({
-      selectedGender: gender
-    });
-    console.log('选择性别:', gender);
-  },
-
-  // 城市输入
-  onCityInput: function(e) {
-    this.setData({
-      'userInfo.city': e.detail.value
+      gender: e.currentTarget.dataset.gender
     });
   },
 
-  // 个人描述输入
-  onDescriptionInput: function(e) {
+  // 输入个人描述
+  inputDescription: function(e) {
     this.setData({
-      'userInfo.personalDescription': e.detail.value
+      description: e.detail.value
     });
   },
 
   // 获取位置
   getLocation: function() {
+    const that = this;
     wx.showLoading({
       title: '获取位置中...',
     });
     
     wx.getLocation({
       type: 'wgs84',
-      success: (res) => {
-        // 使用经纬度获取城市
-        this.getCityFromLocation(res.latitude, res.longitude);
+      success: function(res) {
+        // 使用腾讯地图API根据经纬度获取城市信息
+        wx.request({
+          url: 'https://apis.map.qq.com/ws/geocoder/v1/',
+          data: {
+            location: res.latitude + ',' + res.longitude,
+            key: 'YOUR_KEY_HERE', // 需要替换为实际的腾讯地图API密钥
+            get_poi: 0
+          },
+          success: function(res) {
+            if (res.data.status === 0) {
+              that.setData({
+                city: res.data.result.address_component.city
+              });
+            } else {
+              wx.showToast({
+                title: '获取城市失败',
+                icon: 'none'
+              });
+            }
+          },
+          fail: function() {
+            wx.showToast({
+              title: '获取城市失败',
+              icon: 'none'
+            });
+          },
+          complete: function() {
+            wx.hideLoading();
+          }
+        });
       },
-      fail: () => {
+      fail: function() {
         wx.hideLoading();
-        wx.showToast({
-          title: '获取位置失败',
-          icon: 'none',
-          duration: 2000
+        wx.showModal({
+          title: '提示',
+          content: '获取位置失败，请检查位置权限或手动输入城市',
+          showCancel: false
         });
       }
     });
   },
 
-  // 根据经纬度获取城市名
-  getCityFromLocation: function(latitude, longitude) {
-    // 微信小程序中可以使用微信地图API获取城市名
-    // 这里简化处理，使用一个固定的城市名作为示例
-    setTimeout(() => {
-      wx.hideLoading();
-      this.setData({
-        'userInfo.city': '杭州'
-      });
-      wx.showToast({
-        title: '位置获取成功',
-        icon: 'success',
-        duration: 2000
-      });
-    }, 1000);
-  },
-
-  // 保存到本地存储
-  saveToStorage: function(key, value) {
-    try {
-      // 尝试3次保存，确保数据被正确保存
-      for (let i = 0; i < 3; i++) {
-        wx.setStorageSync(key, value);
-        
-        // 验证数据
-        const savedValue = wx.getStorageSync(key);
-        if (savedValue === value) {
-          console.log(`成功保存数据(第${i+1}次尝试): ${key} = ${value}`);
-          return; // 保存成功，退出循环
-        } else {
-          console.error(`第${i+1}次保存不一致: 期望 ${value}, 实际 ${savedValue}`);
-          // 继续尝试
-        }
-      }
-      console.error(`保存数据失败: ${key}, 尝试3次后仍未成功`);
-    } catch (e) {
-      console.error(`保存数据失败: ${key}`, e);
-      
-      // 使用替代方法尝试保存
-      try {
-        wx.setStorage({
-          key: key,
-          data: value,
-          success: () => {
-            console.log(`使用异步方法成功保存数据: ${key} = ${value}`);
-          },
-          fail: (err) => {
-            console.error(`使用异步方法保存数据失败: ${key}`, err);
-          }
-        });
-      } catch (e2) {
-        console.error(`所有保存方法均失败: ${key}`, e2);
-      }
-    }
-  },
-  
-  // 完成引导
+  // 完成设置
   finishOnboarding: function() {
-    console.log('开始完成引导流程...');
-    
-    // 保存个人描述
-    if (this.data.userInfo.personalDescription) {
-      this.saveToStorage('userPersonalDescription', this.data.userInfo.personalDescription);
-      console.log('保存个人描述:', this.data.userInfo.personalDescription);
+    // 验证输入
+    if (!this.data.city.trim()) {
+      wx.showToast({
+        title: '请输入城市',
+        icon: 'none'
+      });
+      return;
     }
     
-    // 检查并确保数据已保存
+    if (!this.data.gender) {
+      wx.showToast({
+        title: '请选择性别',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    // 把性别从英文转为中文保存
+    const genderText = this.data.gender === 'male' ? '男' : '女';
+    
     try {
-      // 检查是否有城市数据
-      if (this.data.userInfo.city) {
-        this.saveToStorage('userCity', this.data.userInfo.city);
-        console.log('保存城市信息:', this.data.userInfo.city);
+      // 保存单独的数据项以兼容现有检查逻辑
+      wx.setStorageSync('userCity', this.data.city);
+      wx.setStorageSync('userGender', genderText);
+      if (this.data.description) {
+        wx.setStorageSync('userPersonalDescription', this.data.description);
       }
       
-      // 检查是否有性别数据
-      if (this.data.selectedGender) {
-        const genderText = this.data.selectedGender === 'male' ? '男' : '女';
-        this.saveToStorage('userGender', genderText);
-        console.log('保存性别信息:', genderText);
-      }
-
-      // 设置完成引导标识，必须在跳转前设置，避免循环跳转
-      this.saveToStorage('onboardingCompleted', 'true');
+      // 特别是这一项，确保与app.js中的检查逻辑一致
+      wx.setStorageSync('onboardingCompleted', 'true');
       
-      // 设置全局引导状态
-      const app = getApp();
-      app.globalData.onboardingCompleted = true;
-      
-      // 创建一个全局用户信息对象，确保各个页面能访问到相同的数据
-      const userInfo = {
-        city: this.data.userInfo.city || wx.getStorageSync('userCity') || '未设置',
-        gender: (this.data.selectedGender === 'male' ? '男' : (this.data.selectedGender === 'female' ? '女' : '未设置')),
-        description: this.data.userInfo.personalDescription || wx.getStorageSync('userPersonalDescription') || 'AI为你的每日穿搭提供灵感',
-        personalDescription: this.data.userInfo.personalDescription || wx.getStorageSync('userPersonalDescription') || '添加个人描述...'
+      // 也保存到userData中作为备份
+      const userData = {
+        city: this.data.city,
+        gender: genderText,
+        description: this.data.description,
+        onboardingCompleted: true
       };
+      wx.setStorageSync('userData', userData);
       
-      app.globalData.userInfo = userInfo;
+      // 设置全局数据
+      const app = getApp();
+      if (app.globalData) {
+        app.globalData.onboardingCompleted = true;
+        app.globalData.userInfo = {
+          city: this.data.city,
+          gender: genderText,
+          description: this.data.description || 'AI为你的每日穿搭提供灵感',
+          personalDescription: this.data.description || '添加个人描述...'
+        };
+      }
       
-      console.log('引导完成，全局用户信息设置为:', app.globalData.userInfo);
-      console.log('所有数据已保存到本地存储:', {
+      console.log('引导完成，保存的数据:', {
         city: wx.getStorageSync('userCity'),
         gender: wx.getStorageSync('userGender'),
         description: wx.getStorageSync('userPersonalDescription'),
         completed: wx.getStorageSync('onboardingCompleted')
       });
-    } catch(e) {
-      console.error('保存最终数据失败:', e);
-    }
-    
-    console.log('引导完成，准备跳转到首页');
-    
-    // 延迟一下确保存储完成
-    setTimeout(() => {
-      // 使用reLaunch而不是switchTab，避免导航栈问题
-      wx.reLaunch({
-        url: '/pages/index/index',
-        success: (res) => {
-          console.log('跳转成功', res);
-        },
-        fail: (err) => {
-          console.error('跳转失败', err);
-          // 再次尝试
-          wx.switchTab({
-            url: '/pages/index/index'
-          });
-        }
+      
+      // 提示用户设置成功
+      wx.showToast({
+        title: '设置成功',
+        icon: 'success',
+        duration: 1500
       });
-    }, 500); // 增加延时确保数据完全保存
+      
+      // 延迟跳转，确保存储完成
+      setTimeout(() => {
+        // 使用reLaunch避免导航栈问题
+        wx.reLaunch({
+          url: '/pages/index/index',
+          success: function(res) {
+            console.log('跳转首页成功');
+          },
+          fail: function(err) {
+            console.error('跳转失败:', err);
+            // 再次尝试使用switchTab
+            wx.switchTab({
+              url: '/pages/index/index'
+            });
+          }
+        });
+      }, 1800);
+    } catch (e) {
+      console.error('保存数据失败:', e);
+      wx.showToast({
+        title: '保存失败，请重试',
+        icon: 'none'
+      });
+    }
+  },
+
+  // 跳过设置
+  skipOnboarding: function() {
+    wx.showModal({
+      title: '确认跳过',
+      content: '您可以在个人资料页面随时完善您的信息',
+      cancelText: '返回',
+      confirmText: '确认跳过',
+      success: (res) => {
+        if (res.confirm) {
+          try {
+            // 标记引导已完成
+            wx.setStorageSync('onboardingCompleted', 'true');
+            
+            // 更新全局状态
+            const app = getApp();
+            if (app.globalData) {
+              app.globalData.onboardingCompleted = true;
+            }
+            
+            console.log('已跳过引导，设置完成标记');
+            
+            // 延迟跳转，确保存储完成
+            setTimeout(() => {
+              // 使用reLaunch避免导航栈问题
+              wx.reLaunch({
+                url: '/pages/index/index',
+                success: function(res) {
+                  console.log('跳转首页成功');
+                },
+                fail: function(err) {
+                  console.error('跳转失败:', err);
+                  // 再次尝试使用switchTab
+                  wx.switchTab({
+                    url: '/pages/index/index'
+                  });
+                }
+              });
+            }, 300);
+          } catch (e) {
+            console.error('设置跳过状态失败:', e);
+            wx.showToast({
+              title: '操作失败，请重试',
+              icon: 'none'
+            });
+          }
+        }
+      }
+    });
   }
 }); 
