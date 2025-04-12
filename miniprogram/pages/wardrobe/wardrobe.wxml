@@ -1,56 +1,57 @@
+<wxs module="utils" src="../comm.wxs" />
+
 <!--wardrobe.wxml-->
 <view class="container">
   <!-- 搜索栏 -->
   <view class="search-bar">
     <view class="search-input-container">
       <icon type="search" size="15" color="#999"></icon>
-      <input type="text" placeholder="搜索衣物" bindinput="onSearchInput" />
+      <input type="text" placeholder="衣物名称" bindinput="onSearchInput" />
     </view>
     <view class="filter-btn" bindtap="showFilterModal">
-      <image src="/miniprogram/images/wardrobe/filter.png" mode="aspectFit" class="filter-icon"></image>
+      <image src="../../images/wardrobe/filter.png" mode="aspectFit" class="filter-icon"></image>
     </view>
   </view>
 
   <!-- 智衣橱标题 -->
-  <view class="wardrobe-header" bindtap="showAddItemModal"> 
+  <view class="wardrobe-header" bindtap="showAddItemModal">
     <view class="wardrobe-title">+ 添加新衣物</view>
-    <!-- <view class="add-item-btn">+</view> -->
   </view>
 
   <view class="wardrobe-layout">
-  <!-- 分类标签 -->
-  <scroll-view class="category-tabs">
-    <view class="category-tab {{currentCategory === 'all' ? 'active' : ''}}" bindtap="changeCategory" data-category="all">全部</view>
-    <view class="category-tab {{currentCategory === 'tops' ? 'active' : ''}}" bindtap="changeCategory" data-category="tops">上装</view>
-    <view class="category-tab {{currentCategory === 'pants' ? 'active' : ''}}" bindtap="changeCategory" data-category="pants">裤子</view>
-    <view class="category-tab {{currentCategory === 'outerwear' ? 'active' : ''}}" bindtap="changeCategory" data-category="outerwear">外套</view>
-    <view class="category-tab {{currentCategory === 'shoes' ? 'active' : ''}}" bindtap="changeCategory" data-category="shoes">鞋子</view>
-    <view class="category-tab {{currentCategory === 'accessories' ? 'active' : ''}}" bindtap="changeCategory" data-category="accessories">配饰</view>
-    <view class="category-tab {{currentCategory === 'bags' ? 'active' : ''}}" bindtap="changeCategory" data-category="bags">包包</view>
-  </scroll-view>
+    <!-- 分类标签 -->
+    <scroll-view class="category-tabs">
+      <view class="category-tab {{currentCategory === 'all' ? 'active' : ''}}" bindtap="changeCategory" data-category="all">全部</view>
+      <view class="category-tab {{currentCategory === 'tops' ? 'active' : ''}}" bindtap="changeCategory" data-category="tops">上装</view>
+      <view class="category-tab {{currentCategory === 'pants' ? 'active' : ''}}" bindtap="changeCategory" data-category="pants">裤子</view>
+      <view class="category-tab {{currentCategory === 'outerwear' ? 'active' : ''}}" bindtap="changeCategory" data-category="outerwear">外套</view>
+      <view class="category-tab {{currentCategory === 'shoes' ? 'active' : ''}}" bindtap="changeCategory" data-category="shoes">鞋子</view>
+      <view class="category-tab {{currentCategory === 'accessories' ? 'active' : ''}}" bindtap="changeCategory" data-category="accessories">配饰</view>
+      <view class="category-tab {{currentCategory === 'bags' ? 'active' : ''}}" bindtap="changeCategory" data-category="bags">包包</view>
+    </scroll-view>
 
-  <!-- 衣物列表 -->
-  <view class="wardrobe-items">
-    <block wx:if="{{filteredItems.length > 0}}">
-      <view class="wardrobe-grid">
-        <view wx:for="{{filteredItems}}" wx:key="id" class="wardrobe-item" bindtap="showItemDetail" data-id="{{item.id}}">
-          <view class="item-image-container">
-            <image src="{{item.image}}" mode="aspectFill" class="item-image"></image>
-          </view>
-          <view class="item-info">
-            <view class="item-name">{{item.name}}</view>
-            <view class="item-category">{{item.category}}</view>
+    <!-- 衣物列表 -->
+    <view class="wardrobe-items">
+      <block wx:if="{{filteredItems.length > 0}}">
+        <view class="wardrobe-grid">
+          <view wx:for="{{filteredItems}}" wx:key="id" class="wardrobe-item" bindtap="showItemDetail" data-id="{{item.id}}">
+            <view class="item-image-container">
+              <image src="{{item.image}}" mode="aspectFill" class="item-image"></image>
+            </view>
+            <view class="item-info">
+              <view class="item-name">{{item.name}}</view>
+              <view class="item-category">{{item.category}}</view>
+            </view>
           </view>
         </view>
+      </block>
+      <view wx:else class="empty-state">
+        <image src="/miniprogram/images/wardrobe/empty.png" mode="aspectFit" class="empty-image"></image>
+        <view class="empty-text">暂无衣物</view>
+        <!-- <button class="add-clothing-btn" bindtap="showAddItemModal">添加衣物</button> -->
       </view>
-    </block>
-    <view wx:else class="empty-state">
-      <image src="/miniprogram/images/wardrobe/empty.png" mode="aspectFit" class="empty-image"></image>
-      <view class="empty-text">暂无衣物</view>
-      <button class="add-clothing-btn" bindtap="showAddItemModal">添加衣物</button>
     </view>
   </view>
-</view>
 
   <!-- 推荐穿搭部分 -->
   <view class="recommended-outfits" wx:if="{{recommendedOutfits.length > 0}}">
@@ -119,21 +120,16 @@
         <view class="filter-section">
           <view class="filter-title">颜色</view>
           <view class="color-options">
-            <view wx:for="{{colorOptions}}" wx:key="color" 
-                  class="color-option {{filters.colors.includes(item.color) ? 'selected' : ''}}" 
-                  style="background-color: {{item.bg}};" 
-                  bindtap="toggleColorFilter" 
-                  data-color="{{item.color}}">
+            <view wx:for="{{colorOptions}}" wx:key="color" class="color-option {{utils.includes(filters.colors, item.color) ? 'selected' : ''}}" style="background-color: {{item.bg}};" bindtap="toggleColorFilter" data-color="{{item.color}}">
             </view>
           </view>
         </view>
         <view class="filter-section">
-          <view class="filter-title">季节</view>
+          <view class="filter-title">季节
+          </view>
           <view class="season-options">
-            <view wx:for="{{seasonOptions}}" wx:key="season" 
-                  class="season-option {{filters.seasons.includes(item.season) ? 'selected' : ''}}" 
-                  bindtap="toggleSeasonFilter" 
-                  data-season="{{item.season}}">
+            <!-- <wxs module="utils" src="../comm.wxs" /> -->
+            <view wx:for="{{seasonOptions}}" wx:key="season" class="season-option {{utils.includes(filters.seasons, item.season) ? 'selected' : ''}}" bindtap="toggleSeasonFilter" data-season="{{item.season}}">
               {{item.label}}
             </view>
           </view>
@@ -145,4 +141,4 @@
       </view>
     </view>
   </view>
-</view> 
+</view>

@@ -55,8 +55,8 @@ Page({
         id: 1,
         name: '黑色T恤',
         category: '上装',
-        image: '/miniprogram/images/wardrobe/tshirt.png',
-        color: '白色',
+        image: '../../images/wardrobe/tshirt.png',
+        color: '黑色',
         seasons: ['spring', 'summer']
       },
       {
@@ -110,6 +110,7 @@ Page({
   onLoad: function() {
     // 初始化过滤后的衣物列表
     this.filterItems();
+    
   },
 
   onShow: function() {
@@ -172,14 +173,15 @@ Page({
   toggleSeasonFilter: function(e) {
     const season = e.currentTarget.dataset.season;
     const seasons = [...this.data.filters.seasons];
-    
+    console.log('filters.seasons element types:', seasons.map(ele => typeof(ele)));
+    console.log('season type:', typeof(season));
     const index = seasons.indexOf(season);
     if (index === -1) {
       seasons.push(season);
     } else {
       seasons.splice(index, 1);
     }
-    
+ 
     this.setData({
       'filters.seasons': seasons
     });

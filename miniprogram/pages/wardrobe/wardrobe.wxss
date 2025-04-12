@@ -2,7 +2,6 @@
 .container {
   min-height: 100vh;
   background-color: #f8f8f8;
-  padding: 20px;
 }
 
 /* 智衣橱标题 */
@@ -14,10 +13,14 @@
 }
 
 .wardrobe-title {
-  font-size: 24px;
-  font-weight: bold;
+  width: 180px;
+  font-size: 18px;
+  font-weight: 500;
+  text-align: center;
   color: #fff;
-  background-color: #4285f4;
+  background-color: #3B82F6;
+  padding:10px 30px;
+  border-radius: 30px;
 }
 
 .add-item-btn {
@@ -40,7 +43,6 @@
 /* 分类标签 */
 .category-tabs {
   white-space: nowrap;
-  padding-top:10px;
   margin-bottom: 10px;
   width: 90px;
   overflow-y: auto;
@@ -50,28 +52,29 @@
 }
 
 .category-tab {
-  display: display;
-  padding: 8px 16px;
+  display: flex;
+  padding: 12px 0;
   text-align: center;
   align-items: center;
-  margin-right: 10px;
-  margin-bottom: 5px;
   background-color: #fff;
-  border-radius: 20px;
   font-size: 14px;
   color: #666;
+  border-bottom: 1px solid #eaeaea;
+  white-space: nowrap;
+  justify-content: center;
 }
 
 .category-tab.active {
-  background-color: #07c160;
-  color: white;
+  color: #3B82F6;
+  background-color: #f0f7ff;
+  border-left: 3px solid #3B82F6;
 }
 
 /* 搜索栏 */
 .search-bar {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .search-input-container {
@@ -79,9 +82,10 @@
   display: flex;
   align-items: center;
   background-color: #fff;
+  border: 1px solid #f0f0f0;
   border-radius: 8px;
   padding: 8px 12px;
-  margin-right: 10px;
+  margin-right: 3px;
 }
 
 .search-input-container icon {
@@ -97,10 +101,13 @@
   width: 40px;
   height: 40px;
   background-color: #fff;
+  border: 1px solid #f0f0f0;
   border-radius: 8px;
   display: flex;
+  text-align: center;
   align-items: center;
   justify-content: center;
+  font-size:14px;
 }
 
 .filter-icon {
@@ -418,7 +425,7 @@
   color: #666;
 }
 
-.season-option.selected {
+.selected {
   background-color: #07c160;
   color: white;
 }
