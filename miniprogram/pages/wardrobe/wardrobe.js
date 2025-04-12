@@ -173,8 +173,6 @@ Page({
   toggleSeasonFilter: function(e) {
     const season = e.currentTarget.dataset.season;
     const seasons = [...this.data.filters.seasons];
-    console.log('filters.seasons element types:', seasons.map(ele => typeof(ele)));
-    console.log('season type:', typeof(season));
     const index = seasons.indexOf(season);
     if (index === -1) {
       seasons.push(season);

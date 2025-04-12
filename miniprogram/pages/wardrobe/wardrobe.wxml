@@ -46,9 +46,7 @@
         </view>
       </block>
       <view wx:else class="empty-state">
-        <image src="/miniprogram/images/wardrobe/empty.png" mode="aspectFit" class="empty-image"></image>
         <view class="empty-text">暂无衣物</view>
-        <!-- <button class="add-clothing-btn" bindtap="showAddItemModal">添加衣物</button> -->
       </view>
     </view>
   </view>
