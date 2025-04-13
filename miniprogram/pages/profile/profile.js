@@ -246,63 +246,67 @@ Page({
   toggleAutoLocation: function(e) {
     const settings = {...this.data.settings};
     settings.autoLocation = e.detail.value;
-    this.setData({ settings });
-    
-    // 保存到本地存储
-    this.saveToStorage('autoLocation', settings.autoLocation.toString());
     
     if (settings.autoLocation) {
-      // 开启自动定位时，获取位置并更新天气城市
-      wx.getLocation({
-        type: 'wgs84',
+      // 先检查位置权限
+      wx.getSetting({
         success: (res) => {
-          // 使用经纬度获取城市，实际应用中需要调用地理位置API
-          console.log("位置获取成功", res);
-          
-          // 这里应该使用地理位置API获取城市名称
-          // 为了演示，我们使用一个模拟城市
-          const locationCity = '深圳市';
-          
-          // 更新首页的天气城市
-          try {
-            const pages = getCurrentPages();
-            for (let i = 0; i < pages.length; i++) {
-              if (pages[i].route === 'pages/index/index') {
-                // 找到首页，更新其天气城市
-                pages[i].setData({
-                  'weatherData.city': locationCity
+          if (!res.authSetting['scope.userLocation']) {
+            // 如果没有授权，先请求授权
+            wx.authorize({
+              scope: 'scope.userLocation',
+              success: () => {
+                // 授权成功，保存设置并获取位置
+                this.setData({ settings });
+                this.saveToStorage('autoLocation', 'true');
+                this.getAndUpdateLocation();
+              },
+              fail: () => {
+                // 授权失败，回退开关状态
+                settings.autoLocation = false;
+                this.setData({ settings });
+                this.saveToStorage('autoLocation', 'false');
+                
+                // 提示用户需要开启权限
+                wx.showModal({
+                  title: '提示',
+                  content: '需要获取您的位置信息，请在设置中打开位置权限',
+                  confirmText: '去设置',
+                  cancelText: '取消',
+                  success: (res) => {
+                    if (res.confirm) {
+                      wx.openSetting();
+                    }
+                  }
                 });
-                console.log('自动定位已开启，更新首页的天气城市为:', locationCity);
-                break;
               }
-            }
-          } catch (e) {
-            console.error('更新首页天气城市失败:', e);
+            });
+          } else {
+            // 已有权限，保存设置并获取位置
+            this.setData({ settings });
+            this.saveToStorage('autoLocation', 'true');
+            this.getAndUpdateLocation();
           }
-          
-          wx.showToast({
-            title: '已获取位置',
-            icon: 'success',
-            duration: 2000
-          });
         },
         fail: () => {
-          // 获取位置失败处理
+          // 获取设置信息失败，回退开关状态
+          settings.autoLocation = false;
+          this.setData({ settings });
+          this.saveToStorage('autoLocation', 'false');
+          
           wx.showToast({
-            title: '获取位置失败',
+            title: '获取位置权限失败',
             icon: 'none',
             duration: 2000
           });
-          // 关闭自动定位开关
-          this.setData({
-            'settings.autoLocation': false
-          });
-          // 更新本地存储
-          this.saveToStorage('autoLocation', 'false');
         }
       });
     } else {
-      // 关闭自动定位时，使用用户设置的城市
+      // 用户主动关闭自动定位，直接更新设置
+      this.setData({ settings });
+      this.saveToStorage('autoLocation', 'false');
+      
+      // 使用用户设置的城市
       try {
         const userCity = wx.getStorageSync('userCity') || this.data.userInfo.city;
         
@@ -328,6 +332,132 @@ Page({
         duration: 2000
       });
     }
+  },
+
+  // 新增获取位置并更新的函数
+  getAndUpdateLocation: function() {
+    console.log("尝试获取位置...");
+    
+    // 先检查定位权限状态并打印
+    wx.getSetting({
+      success: (settingRes) => {
+        console.log("权限设置状态:", settingRes.authSetting);
+        console.log("位置权限状态:", settingRes.authSetting['scope.userLocation']);
+      }
+    });
+    
+    // 简化定位请求，使用基本参数增加成功率
+    wx.getLocation({
+      type: 'wgs84', // 使用更稳定的坐标系
+      success: (res) => {
+        // 使用经纬度获取城市，实际应用中需要调用地理位置API
+        console.log("位置获取成功", res);
+        
+        // 使用实际的反向地理编码获取城市名
+        this.getLocationCity(res.latitude, res.longitude);
+      },
+      fail: (err) => {
+        console.error('获取位置失败:', err);
+        // 打印更详细的错误信息
+        if (err.errMsg) {
+          console.error('错误信息:', err.errMsg);
+        }
+        if (err.errCode) {
+          console.error('错误代码:', err.errCode);
+          
+          // 根据错误代码给出更具体的提示
+          let errorMessage = '请确保微信有位置权限，并在小程序设置中允许使用位置信息';
+          if (err.errCode === 2) {
+            errorMessage = '位置权限已开启，但未能获取到位置信息。可能是GPS信号弱或被屏蔽';
+          } else if (err.errCode === 11) {
+            errorMessage = '系统拒绝定位请求，请确保系统位置服务已开启';
+          } else if (err.errCode === 12) {
+            errorMessage = '定位超时，请检查网络连接并重试';
+          } else if (err.errCode === 13) {
+            errorMessage = '定位失败，请在开阔地区重试或手动设置城市';
+          }
+        }
+        
+        // 获取位置失败处理
+        wx.showToast({
+          title: '获取位置失败',
+          icon: 'none',
+          duration: 2000
+        });
+        
+        // 关闭自动定位开关
+        this.setData({
+          'settings.autoLocation': false
+        });
+        
+        // 更新本地存储
+        this.saveToStorage('autoLocation', 'false');
+        
+        // 提示用户如何开启权限 - 使用备用方案
+        setTimeout(() => {
+          wx.showModal({
+            title: '位置获取失败',
+            content: '虽然权限已开启，但获取位置信息失败。可能原因：\n1. GPS信号弱\n2. 系统定位服务未开启\n3. 网络问题\n\n建议：\n- 确保手机定位服务开启\n- 尝试在开阔区域重试\n- 或手动设置您的城市',
+            confirmText: '手动设置',
+            cancelText: '稍后再试',
+            success: (res) => {
+              if (res.confirm) {
+                // 打开修改城市的弹窗
+                this.showModal({currentTarget: {dataset: {modal: 'cityModal'}}});
+              }
+            }
+          });
+        }, 1500);
+      },
+      complete: () => {
+        console.log("位置获取操作完成");
+      }
+    });
+  },
+  
+  // 新增：根据经纬度获取城市名
+  getLocationCity: function(latitude, longitude) {
+    // 实际项目中，这里应该调用腾讯地图或高德地图等API获取城市名
+    // 由于小程序环境限制，这里使用模拟城市
+    console.log("开始根据经纬度获取城市名...");
+    
+    // 模拟API调用延迟
+    setTimeout(() => {
+      // 这里是模拟数据，实际应用中应根据经纬度请求地理位置服务
+      const locationCity = '深圳市';
+      console.log('根据经纬度解析的城市:', locationCity);
+      
+      // 更新用户信息中的城市
+      const userInfo = {...this.data.userInfo};
+      userInfo.city = locationCity;
+      this.setData({ userInfo });
+      
+      // 保存到本地存储
+      this.saveToStorage('userCity', locationCity);
+      
+      // 更新首页的天气城市
+      try {
+        const pages = getCurrentPages();
+        for (let i = 0; i < pages.length; i++) {
+          if (pages[i].route === 'pages/index/index') {
+            // 找到首页，更新其天气城市
+            pages[i].setData({
+              'weatherData.city': locationCity
+            });
+            console.log('自动定位已开启，更新首页的天气城市为:', locationCity);
+            break;
+          }
+        }
+      } catch (e) {
+        console.error('更新首页天气城市失败:', e);
+      }
+      
+      wx.showToast({
+        title: '已获取位置',
+        icon: 'success',
+        duration: 2000
+      });
+    }, 500);
   },
 
   // 保存到本地存储

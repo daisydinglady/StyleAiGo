@@ -58,7 +58,7 @@
     
     <view class="card-item">
       <view class="item-label">自动定位</view>
-      <switch checked="{{settings.autoLocation || true}}" bindchange="toggleAutoLocation" color="#4080ff" />
+      <switch checked="{{settings.autoLocation}}" bindchange="toggleAutoLocation" color="#4080ff" />
     </view>
     
     <view class="card-item" bindtap="showModal" data-modal="temperatureUnitModal">
@@ -96,7 +96,9 @@
   
   <!-- 退出登录按钮 -->
   <view class="logout-btn-container">
-    <button class="logout-btn" bindtap="logout">退出登录</button>
+    <button class="logout-btn">
+    <text bindtap="logout">退出登录</text>
+   </button>
   </view>
 </view>
 

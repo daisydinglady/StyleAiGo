@@ -54,5 +54,8 @@
     "scope.userLocation": {
       "desc": "获取位置信息用于显示当地天气"
     }
-  }
+  },
+  "requiredPrivateInfos": [
+    "getLocation"
+  ]
 }
