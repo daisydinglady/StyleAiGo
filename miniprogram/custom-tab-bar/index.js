@@ -7,17 +7,17 @@ Component({
       {
       pagePath: "/pages/index/index",
       iconPath: "/images/icons/weather-icon.png",
-      selectedIconPath: "/images/icons/weather-icon.png",
+      selectedIconPath: "/images/icons/weather-selected.png",
       text: "OOTD"
     }, {
       pagePath: "/pages/wardrobe/wardrobe",
-      iconPath: "/images/icons/weather-icon.png",
-      selectedIconPath: "/images/icons/weather-icon.png",
+      iconPath: "/images/icons/wardrobe-icon.png",
+      selectedIconPath: "/images/icons/wardrobe-selected.png",
       text: "智衣橱"
     }, {
       pagePath: "/pages/profile/profile",
-      iconPath: "/images/icons/weather-icon.png",
-      selectedIconPath: "/images/icons/weather-icon.png",
+      iconPath: "/images/icons/mine-icon.png",
+      selectedIconPath: "/images/icons/mine-selected.png",
       text: "我的"
     }]
   },

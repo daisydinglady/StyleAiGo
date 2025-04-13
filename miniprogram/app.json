@@ -24,19 +24,19 @@
         "pagePath": "pages/index/index",
         "text": "OOTD",
         "iconPath": "images/icons/weather-icon.png",
-        "selectedIconPath": "images/icons/weather-icon.png"
+        "selectedIconPath": "images/icons/weather-selected.png"
       },
       {
         "pagePath": "pages/wardrobe/wardrobe",
         "text": "智衣橱",
-        "iconPath": "images/icons/weather-icon.png",
-        "selectedIconPath": "images/icons/weather-icon.png"
+        "iconPath": "images/icons/wardrobe-icon.png",
+        "selectedIconPath": "images/icons/wardrobe-selected.png"
       },
       {
         "pagePath": "pages/profile/profile",
         "text": "我的",
-        "iconPath": "images/icons/weather-icon.png",
-        "selectedIconPath": "images/icons/weather-icon.png"
+        "iconPath": "images/icons/mine-icon.png",
+        "selectedIconPath": "images/icons/mine-selected.png"
       }
     ]
   },
