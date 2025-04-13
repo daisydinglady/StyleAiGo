@@ -1,4 +1,5 @@
 {
   "usingComponents": {
+    "ootd-popup": "../../components/ootd-popup/ootd-popup"
   }
 }

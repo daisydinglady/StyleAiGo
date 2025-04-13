@@ -71,7 +71,7 @@
 }
 
 .title {
-  font-size: 28px;
+  font-size: 25px;
   font-weight: bold;
   color: #333;
   margin-bottom: 16px;

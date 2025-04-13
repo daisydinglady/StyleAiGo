@@ -54,15 +54,29 @@
   <view class="style-container">
     <view class="style-title">今日穿搭风格</view>
     <view class="style-options">
-      <view class="style-option {{selectedStyle === item ? 'selected' : ''}}" 
-            wx:for="{{styleOptions}}" 
-            wx:key="*this"
+      <view class="style-option {{selectedStyle === item.name ? 'selected' : ''}}" 
+            wx:for="{{styles}}" 
+            wx:key="id"
             bindtap="selectStyle"
             data-index="{{index}}">
-        {{item}}
+        {{item.name}}
       </view>
     </view>
     <button class="generate-ootd-btn" bindtap="generateOOTD">生成今日OOTD</button>
   </view>
 </scroll-view>
+
+<!-- OOTD弹窗组件 -->
+<ootd-popup 
+  show="{{showOOTDPopup}}" 
+  bind:close="onCloseOOTDPopup"
+  bind:favorite="onFavoriteOOTD"
+  bind:save="onSaveOOTD"
+  weatherInfo="{{weatherData.temperature}} {{weatherData.condition}}"
+  styleType="{{selectedStyle}}"
+  ootdDesc="{{ootdRecommendation.description}}"
+  clothingItems="{{ootdRecommendation.items}}"
+  styleImages="{{ootdRecommendation.images}}"
+  fashionTip="{{ootdRecommendation.tip}}"
+></ootd-popup>
 

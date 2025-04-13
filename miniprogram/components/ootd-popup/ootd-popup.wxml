@@ -1,0 +1,75 @@
+<!--ootd-popup.wxml-->
+<view class="popup-mask" wx:if="{{show}}" bindtap="onClose">
+  <view class="popup-content" catchtap="stopPropagation">
+    <view class="popup-header">
+      <text class="popup-title">今日OOTD推荐</text>
+      <view class="close-btn" bindtap="onClose">
+        <text class="icon-close">×</text>
+      </view>
+    </view>
+    
+    <view class="tags">
+      <view class="weather-tag tag">
+        <text class="tag-icon">☀️</text> {{weatherInfo}}
+      </view>
+      <view class="tag">
+        <text class="tag-icon">👕</text> {{styleType}}
+      </view>
+    </view>
+    
+    <view class="outfit-details">
+      <text class="section-title">今日穿搭建议</text>
+      <text class="outfit-desc">{{ootdDesc}}</text>
+      
+      <view class="clothing-item" wx:for="{{clothingItems}}" wx:key="type">
+        <view class="clothing-item-icon {{item.iconBg}}">
+          <text class="item-icon">{{item.icon}}</text>
+        </view>
+        <view class="item-info">
+          <text class="item-title">{{item.title}}</text>
+          <text class="item-desc">{{item.desc}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <text class="section-title">风格展示</text>
+    
+    <view class="carousel">
+      <view class="carousel-inner" style="transform: translateX(-{{currentSlide * 100}}%)">
+        <view class="carousel-item" wx:for="{{styleImages}}" wx:key="index">
+          <image src="{{item}}" class="carousel-img" mode="aspectFill" />
+        </view>
+      </view>
+      <view class="carousel-control carousel-prev" bindtap="prevSlide">
+        <text class="control-icon">〈</text>
+      </view>
+      <view class="carousel-control carousel-next" bindtap="nextSlide">
+        <text class="control-icon">〉</text>
+      </view>
+      <view class="carousel-indicators">
+        <view class="carousel-indicator {{currentSlide === index ? 'active' : ''}}" 
+              wx:for="{{styleImages}}" 
+              wx:key="index"
+              bindtap="goToSlide"
+              data-index="{{index}}"></view>
+      </view>
+    </view>
+    
+    <view class="tips">
+      <text class="tip-icon">💡</text>
+      <text class="tip-text">{{fashionTip}}</text>
+    </view>
+    
+    <view class="action-buttons">
+      <button class="btn btn-secondary" bindtap="onFavorite">
+        <text class="btn-icon">❤️</text> 收藏
+      </button>
+      <button class="btn btn-primary" bindtap="onSave">
+        <text class="btn-icon">保存到我的搭配</text> 
+      </button>
+    </view>
+    <view class="popup-footer">
+      <text class="footer-text">根据个人衣橱和天气情况，AI已为您精心推荐以上搭配</text>
+    </view>
+  </view>
+</view> 
