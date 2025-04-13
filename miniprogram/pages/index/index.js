@@ -1,6 +1,9 @@
 // index.js
 const defaultAvatarUrl = 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0'
 
+// 引入天气服务
+const weatherService = require('../../services/weather/weatherService');
+
 // 获取应用实例
 const app = getApp()
 
@@ -388,50 +391,27 @@ Page({
 
   // 根据经纬度获取城市信息
   getCityFromLocation(latitude, longitude) {
-    // 可以调用微信的逆地址解析API或其他第三方地图API
-    // 这里使用模拟数据
-    /*
-    wx.request({
-      url: 'https://api.map.baidu.com/reverse_geocoding/v3',
-      data: {
-        ak: 'YOUR_BAIDU_MAP_KEY',
-        location: `${latitude},${longitude}`,
-        output: 'json'
-      },
-      success: (res) => {
-        if (res.data && res.data.result && res.data.result.addressComponent) {
-          const city = res.data.result.addressComponent.city;
-          
+    // 使用OpenWeather的天气数据获取城市信息
+    weatherService.getCurrentWeatherByCoords(latitude, longitude, 'zh_cn')
+      .then(weatherData => {
+        if (weatherData && weatherData.cityName) {
           // 检查自动定位是否开启
           const autoLocation = wx.getStorageSync('autoLocation');
           if (autoLocation !== 'false') {
+            const locationCity = weatherData.cityName;
             this.setData({
-              'weatherData.city': city
+              'weatherData.city': locationCity
             });
-            
-            // 获取该城市的天气数据
-            this.getWeatherData(city);
+            console.log('位置已从天气API更新为:', locationCity);
           }
         }
-      },
-      fail: (err) => {
-        console.error('获取城市信息失败:', err);
-      }
-    });
-    */
-
-    // 模拟数据
-    setTimeout(() => {
-      // 检查自动定位是否开启
-      const autoLocation = wx.getStorageSync('autoLocation');
-      if (autoLocation !== 'false') {
-        const locationCity = '深圳市';
-        this.setData({
-          'weatherData.city': locationCity
-        });
-        console.log('位置已更新为:', locationCity);
-      }
-    }, 1000);
+      })
+      .catch(err => {
+        console.error('通过天气API获取城市信息失败:', err);
+        
+        // 如果通过天气API获取失败，可以尝试通过地图API获取
+        // 这里可以集成微信地图API或其他第三方地图API
+      });
   },
 
   switchTab(e) {
@@ -688,32 +668,180 @@ Page({
 
   // 获取天气数据
   getWeatherData(city) {
-    // 真实应用中应调用天气API
-    // 这里使用模拟数据
-    console.log('获取天气数据, 城市:', city || this.data.weatherData.city);
+    // 天气图标映射表 (OpenWeather天气代码 到 emoji)
+    const weatherIconMap = {
+      'Clear': '🌞',
+      'Clouds': '☁️',
+      'Rain': '🌧️',
+      'Drizzle': '🌦️',
+      'Thunderstorm': '⛈️',
+      'Snow': '❄️',
+      'Mist': '🌫️',
+      'Fog': '🌫️',
+      'Haze': '🌫️',
+      'Dust': '🌫️',
+      'Smoke': '🌫️',
+      'Sand': '🌫️',
+      'Ash': '🌫️',
+      'Squall': '💨',
+      'Tornado': '🌪️'
+    };
 
-    // 可以使用wx.request调用实际API
-    /*
-    wx.request({
-      url: 'weather-api-url',
-      data: {
-        city: city || this.data.weatherData.city
-      },
+    // 天气描述中文映射
+    const weatherDescMap = {
+      'Clear': '晴',
+      'Clouds': '多云',
+      'Rain': '雨',
+      'Drizzle': '小雨',
+      'Thunderstorm': '雷阵雨',
+      'Snow': '雪',
+      'Mist': '薄雾',
+      'Fog': '雾',
+      'Haze': '霾',
+      'Dust': '浮尘',
+      'Smoke': '烟雾',
+      'Sand': '沙尘',
+      'Ash': '灰烬',
+      'Squall': '暴风',
+      'Tornado': '龙卷风'
+    };
+
+    wx.showLoading({
+      title: '获取天气中...',
+    });
+
+    // 如果提供了城市名称，则使用城市名称获取天气
+    if (city) {
+      console.log('使用城市名称获取天气:', city);
+      weatherService.getCurrentWeather(city, 'zh_cn')
+        .then(currentWeather => {
+          handleCurrentWeather(currentWeather);
+          
+          // 使用城市的坐标获取天气预报
+          return weatherService.getWeatherForecast({
+            latitude: currentWeather.coords.lat,
+            longitude: currentWeather.coords.lon,
+            lang: 'zh_cn',
+            units: 'metric',
+            success: handleForecastWeather,
+            fail: handleForecastError
+          });
+        })
+        .then(() => {
+          console.log('使用城市名称的天气数据获取完成');
+        })
+        .catch(error => {
+          console.error('使用城市名称获取天气失败:', error);
+          wx.hideLoading();
+          wx.showToast({
+            title: '获取天气失败',
+            icon: 'none',
+            duration: 2000
+          });
+        });
+      return;
+    }
+
+    // 如果没有提供城市名称，使用位置坐标获取天气
+    wx.getLocation({
+      type: 'wgs84',
       success: (res) => {
-        // 处理返回数据
+        const { latitude, longitude } = res;
+        console.log('获取位置成功:', latitude, longitude);
+
+        // 先获取当前天气
+        weatherService.getCurrentWeatherByCoords(latitude, longitude, 'zh_cn')
+          .then(currentWeather => {
+            handleCurrentWeather(currentWeather);
+
+            // 然后获取未来7天天气预报
+            return weatherService.getWeatherForecast({
+              latitude: latitude,
+              longitude: longitude,
+              lang: 'zh_cn',
+              units: 'metric',
+              success: handleForecastWeather,
+              fail: handleForecastError
+            });
+          })
+          .then(() => {
+            console.log('天气数据获取完成');
+          })
+          .catch(error => {
+            console.error('获取天气数据失败:', error);
+            wx.hideLoading();
+            wx.showToast({
+              title: '获取天气失败',
+              icon: 'none',
+              duration: 2000
+            });
+          });
+      },
+      fail: (err) => {
+        console.error('获取位置失败:', err);
+        wx.hideLoading();
+        wx.showToast({
+          title: '获取位置失败',
+          icon: 'none',
+          duration: 2000
+        });
+
+        // 使用默认城市数据
         this.setData({
-          weatherData: {
-            city: city || this.data.weatherData.city,
-            date: this.getCurrentDate(),
-            temperature: res.data.temperature,
-            condition: res.data.condition,
-            wind: res.data.wind,
-            humidity: res.data.humidity
-          },
-          forecastData: res.data.forecast
+          'weatherData.city': this.data.weatherData.city || '北京市',
+          'weatherData.temperature': '25°',
+          'weatherData.condition': '晴',
+          'weatherData.wind': '微风',
+          'weatherData.humidity': '湿度 50%'
         });
       }
     });
-    */
+    
+    // 处理当前天气数据
+    const handleCurrentWeather = (currentWeather) => {
+      console.log('当前天气数据:', currentWeather);
+      // 更新当前天气数据
+      this.setData({
+        'weatherData.city': currentWeather.cityName,
+        'weatherData.temperature': `${currentWeather.temperature}°`,
+        'weatherData.condition': weatherDescMap[currentWeather.weatherMain] || currentWeather.weatherDescription,
+        'weatherData.humidity': `湿度 ${currentWeather.humidity}%`,
+        'weatherData.wind': `风速 ${currentWeather.windSpeed}m/s`
+      });
+    };
+    
+    // 处理天气预报数据
+    const handleForecastWeather = (forecastData) => {
+      console.log('天气预报数据:', forecastData);
+      
+      // 更新七日天气预报数据
+      const newForecastData = forecastData.daily.slice(0, 7).map((day, index) => {
+        return {
+          day: index === 0 ? '今天' : 
+               index === 1 ? '明天' : 
+               `周${['日','一','二','三','四','五','六'][new Date().getDay() + index > 6 ? (new Date().getDay() + index) % 7 : new Date().getDay() + index]}`,
+          icon: weatherIconMap[day.weather.main] || weatherIconMap[day.weatherMain] || '☁️',
+          highTemp: day.temp ? `${day.temp.max}°` : (day.tempMax ? `${day.tempMax}°` : '25°'),
+          lowTemp: day.temp ? `${day.temp.min}°` : (day.tempMin ? `${day.tempMin}°` : '15°')
+        };
+      });
+
+      this.setData({
+        forecastData: newForecastData
+      });
+
+      wx.hideLoading();
+    };
+    
+    // 处理天气预报错误
+    const handleForecastError = (error) => {
+      console.error('获取天气预报数据失败:', error);
+      wx.hideLoading();
+      wx.showToast({
+        title: '获取天气预报失败',
+        icon: 'none',
+        duration: 2000
+      });
+    };
   },
 })
