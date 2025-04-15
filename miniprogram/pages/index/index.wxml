@@ -27,8 +27,8 @@
       <!-- 右侧天气图标和温度范围 -->
       <view class="right-weather-info">
         <view class="weather-icon-large">
-          <image wx:if="{{weatherData.condition === '晴'}}" src="/images/weather/sunny.svg" mode="aspectFit"></image>
-          <text wx:else>🌞</text>
+          <!-- <image wx:if="{{weatherData.condition === '晴'}}" src="/images/weather/sunny.svg" mode="aspectFit"></image> -->
+          <text>{{weatherData.icon}}</text>
         </view>
         <view class="temp-range">
           <text>{{forecastData[0].lowTemp}}~{{forecastData[0].highTemp}}</text>
@@ -38,8 +38,10 @@
   </view>
   
   <!-- 七日天气预报 -->
+  <!-- 考虑不展示 -->
   <view class="forecast-container">
-    <view class="forecast-title">近7日天气</view>
+    <view class="forecast-title">未来天气</view>
+    
     <view class="forecast-list">
       <view class="forecast-item" wx:for="{{forecastData}}" wx:key="day">
         <text class="day">{{item.day}}</text>

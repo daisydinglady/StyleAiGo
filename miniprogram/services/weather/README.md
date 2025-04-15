@@ -21,7 +21,7 @@ const weatherService = require("../../services/weather/weatherService");
 
 // 根据城市名称获取当前天气
 weatherService
-  .getCurrentWeather("北京", "zh_cn")
+  .getCurrentWeather("beijing", "zh_cn")
   .then((data) => {
     console.log("天气数据:", data);
   })

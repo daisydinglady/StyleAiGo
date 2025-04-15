@@ -56,7 +56,8 @@
     }
   },
   "requiredPrivateInfos": [
-    "getLocation"
+    "getLocation",
+    "chooseLocation"
   ],
   "networkTimeout": {
     "request": 10000,
