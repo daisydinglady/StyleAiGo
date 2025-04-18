@@ -4,7 +4,8 @@
     "pages/logs/logs",
     "pages/profile/profile",
     "pages/wardrobe/wardrobe",
-    "pages/onboarding/onboarding"
+    "pages/onboarding/onboarding",
+    "pages/bodyProfile/bodyProfile"
   ],
   "window": {
     "backgroundTextStyle": "light",

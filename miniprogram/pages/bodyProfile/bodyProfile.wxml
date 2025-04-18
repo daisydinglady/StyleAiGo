@@ -1,0 +1,271 @@
+<!--bodyProfile.wxml-->
+<view class="container">
+  <view class="form-container">
+    <!-- 基本信息 -->
+    <view class="form-section">
+      <view class="section-title">基本信息</view>
+      <view class="form-item">
+        <view class="item-label">生日</view>
+        <picker mode="date" value="{{birthday}}" bindchange="onBirthdayChange">
+          <view class="picker-value">{{birthday || '请选择生日'}}</view>
+        </picker>
+      </view>
+      <view class="form-item">
+        <view class="item-label">身高(cm)</view>
+        <input type="digit" value="{{height}}" bindinput="onHeightChange" placeholder="请输入身高"/>
+      </view>
+      <view class="form-item">
+        <view class="item-label">体重(kg)</view>
+        <input type="digit" value="{{weight}}" bindinput="onWeightChange" placeholder="请输入体重"/>
+      </view>
+      <view class="form-item">
+        <view class="item-label">胸围(cm)</view>
+        <input type="digit" value="{{bust}}" bindinput="onBustChange" placeholder="请输入胸围"/>
+      </view>
+      <view class="form-item">
+        <view class="item-label">腰围(cm)</view>
+        <input type="digit" value="{{waist}}" bindinput="onWaistChange" placeholder="请输入腰围"/>
+      </view>
+      <view class="form-item">
+        <view class="item-label">臀围(cm)</view>
+        <input type="digit" value="{{hips}}" bindinput="onHipsChange" placeholder="请输入臀围"/>
+      </view>
+    </view>
+
+    <!-- 体型选择 -->
+    <view class="form-section">
+      <view class="section-title">体型</view>
+      <view class="option-group">
+        <block wx:if="{{userInfo.gender === '女'}}">
+          <view class="option-item {{bodyType === '沙漏形' ? 'selected' : ''}}" bindtap="selectBodyType" data-type="沙漏形">
+            <image class="option-icon" src="../../images/bodyType/hourglass.png" mode="aspectFit"/>
+            <text>沙漏形</text>
+          </view>
+          <view class="option-item {{bodyType === '直筒形' ? 'selected' : ''}}" bindtap="selectBodyType" data-type="直筒形">
+            <image class="option-icon" src="../../images/bodyType/rectangle.png" mode="aspectFit"/>
+            <text>直筒形</text>
+          </view>
+          <view class="option-item {{bodyType === '倒三角' ? 'selected' : ''}}" bindtap="selectBodyType" data-type="倒三角">
+            <image class="option-icon" src="../../images/bodyType/inverted.png" mode="aspectFit"/>
+            <text>倒三角</text>
+          </view>
+          <view class="option-item {{bodyType === '梨形' ? 'selected' : ''}}" bindtap="selectBodyType" data-type="梨形">
+            <image class="option-icon" src="../../images/bodyType/pear.png" mode="aspectFit"/>
+            <text>梨形</text>
+          </view>
+          <view class="option-item {{bodyType === '苹果形' ? 'selected' : ''}}" bindtap="selectBodyType" data-type="苹果形">
+            <image class="option-icon" src="../../images/bodyType/apple.png" mode="aspectFit"/>
+            <text>苹果形</text>
+          </view>
+        </block>
+        <block wx:else>
+          <view class="option-item {{bodyType === '直筒形' ? 'selected' : ''}}" bindtap="selectBodyType" data-type="直筒形">
+            <image class="option-icon" src="../../images/bodyType/rectangle.png" mode="aspectFit"/>
+            <text>直筒形</text>
+          </view>
+          <view class="option-item {{bodyType === '倒三角' ? 'selected' : ''}}" bindtap="selectBodyType" data-type="倒三角">
+            <image class="option-icon" src="../../images/bodyType/inverted.png" mode="aspectFit"/>
+            <text>倒三角</text>
+          </view>
+          <view class="option-item {{bodyType === '苹果形' ? 'selected' : ''}}" bindtap="selectBodyType" data-type="苹果形">
+            <image class="option-icon" src="../../images/bodyType/apple.png" mode="aspectFit"/>
+            <text>苹果形</text>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <!-- 上下身比例 -->
+    <view class="form-section">
+      <view class="section-title">上下身比例</view>
+      <view class="option-group">
+        <view class="option-item {{bodyProportion === '三七' ? 'selected' : ''}}" bindtap="selectBodyProportion" data-proportion="三七">
+          <image class="option-icon" src="../../images/bodyType/37.png" mode="aspectFit"/>
+          <text>三七</text>
+        </view>
+        <view class="option-item {{bodyProportion === '四六' ? 'selected' : ''}}" bindtap="selectBodyProportion" data-proportion="四六">
+          <image class="option-icon" src="../../images/bodyType/46.png" mode="aspectFit"/>
+          <text>四六</text>
+        </view>
+        <view class="option-item {{bodyProportion === '五五' ? 'selected' : ''}}" bindtap="selectBodyProportion" data-proportion="五五">
+          <image class="option-icon" src="../../images/bodyType/55.png" mode="aspectFit"/>
+          <text>五五</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 女性特有选项 -->
+    <block wx:if="{{userInfo.gender === '女'}}">
+      <!-- 锁骨 -->
+      <view class="form-section">
+        <view class="section-title">锁骨</view>
+        <view class="option-group">
+          <view class="option-item {{collarbone === '明显' ? 'selected' : ''}}" bindtap="selectCollarbone" data-type="明显">
+            <image class="option-icon" src="../../images/bodyType/collarbone1.png" mode="aspectFit"/>
+            <text>明显</text>
+          </view>
+          <view class="option-item {{collarbone === '正常' ? 'selected' : ''}}" bindtap="selectCollarbone" data-type="正常">
+            <image class="option-icon" src="../../images/bodyType/collarbone2.png" mode="aspectFit"/>
+            <text>正常</text>
+          </view>
+          <view class="option-item {{collarbone === '较肉' ? 'selected' : ''}}" bindtap="selectCollarbone" data-type="较肉">
+            <image class="option-icon" src="../../images/bodyType/collarbone3.png" mode="aspectFit"/>
+            <text>较肉</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 胸部 -->
+      <view class="form-section">
+        <view class="section-title">胸部</view>
+        <view class="option-group">
+          <view class="option-item {{chest === '丰满' ? 'selected' : ''}}" bindtap="selectChest" data-type="丰满">
+            <image class="option-icon" src="../../images/bodyType/chest1.png" mode="aspectFit"/>
+            <text>丰满</text>
+          </view>
+          <view class="option-item {{chest === '正常' ? 'selected' : ''}}" bindtap="selectChest" data-type="正常">
+            <image class="option-icon" src="../../images/bodyType/chest2.png" mode="aspectFit"/>
+            <text>正常</text>
+          </view>
+          <view class="option-item {{chest === '平胸' ? 'selected' : ''}}" bindtap="selectChest" data-type="平胸">
+            <image class="option-icon" src="../../images/bodyType/chest3.png" mode="aspectFit"/>
+            <text>平胸</text>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <!-- 腰腹部 -->
+    <view class="form-section">
+      <view class="section-title">腰腹部</view>
+      <view class="option-group">
+        <view class="option-item {{waistType === '马甲线' ? 'selected' : ''}}" bindtap="selectWaistType" data-type="马甲线">
+          <image class="option-icon" src="../../images/bodyType/waist1.png" mode="aspectFit"/>
+          <text>马甲线</text>
+        </view>
+        <view class="option-item {{waistType === '平坦' ? 'selected' : ''}}" bindtap="selectWaistType" data-type="平坦">
+          <image class="option-icon" src="../../images/bodyType/waist2.png" mode="aspectFit"/>
+          <text>平坦</text>
+        </view>
+        <view class="option-item {{waistType === '微凸' ? 'selected' : ''}}" bindtap="selectWaistType" data-type="微凸">
+          <image class="option-icon" src="../../images/bodyType/waist3.png" mode="aspectFit"/>
+          <text>微凸</text>
+        </view>
+        <view class="option-item {{waistType === '较凸' ? 'selected' : ''}}" bindtap="selectWaistType" data-type="较凸">
+          <image class="option-icon" src="../../images/bodyType/waist4.png" mode="aspectFit"/>
+          <text>较凸</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 女性特有选项 -->
+    <block wx:if="{{userInfo.gender === '女'}}">
+      <!-- 胯部 -->
+      <view class="form-section">
+        <view class="section-title">胯部</view>
+        <view class="option-group">
+          <view class="option-item {{hipsWidth === '较宽' ? 'selected' : ''}}" bindtap="selectHipsWidth" data-type="较宽">
+            <image class="option-icon" src="../../images/bodyType/hips1.png" mode="aspectFit"/>
+            <text>较宽</text>
+          </view>
+          <view class="option-item {{hipsWidth === '正常' ? 'selected' : ''}}" bindtap="selectHipsWidth" data-type="正常">
+            <image class="option-icon" src="../../images/bodyType/hips2.png" mode="aspectFit"/>
+            <text>正常</text>
+          </view>
+          <view class="option-item {{hipsWidth === '较窄' ? 'selected' : ''}}" bindtap="selectHipsWidth" data-type="较窄">
+            <image class="option-icon" src="../../images/bodyType/hips3.png" mode="aspectFit"/>
+            <text>较窄</text>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <!-- 臀型 -->
+    <view class="form-section">
+      <view class="section-title">臀型</view>
+      <view class="option-group">
+        <view class="option-item {{buttocksType === '翘臀' ? 'selected' : ''}}" bindtap="selectButtocksType" data-type="翘臀">
+          <image class="option-icon" src="../../images/bodyType/buttocks1.png" mode="aspectFit"/>
+          <text>翘臀</text>
+        </view>
+        <view class="option-item {{buttocksType === '正常' ? 'selected' : ''}}" bindtap="selectButtocksType" data-type="正常">
+          <image class="option-icon" src="../../images/bodyType/buttocks2.png" mode="aspectFit"/>
+          <text>正常</text>
+        </view>
+        <view class="option-item {{buttocksType === '扁平' ? 'selected' : ''}}" bindtap="selectButtocksType" data-type="扁平">
+          <image class="option-icon" src="../../images/bodyType/buttocks3.png" mode="aspectFit"/>
+          <text>扁平</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 腿型 -->
+    <view class="form-section">
+      <view class="section-title">腿型</view>
+      <view class="option-group">
+        <view class="option-item {{legType === '标准' ? 'selected' : ''}}" bindtap="selectLegType" data-type="标准">
+          <image class="option-icon" src="../../images/bodyType/legs1.png" mode="aspectFit"/>
+          <text>标准</text>
+        </view>
+        <view class="option-item {{legType === 'O型' ? 'selected' : ''}}" bindtap="selectLegType" data-type="O型">
+          <image class="option-icon" src="../../images/bodyType/legs2.png" mode="aspectFit"/>
+          <text>O型</text>
+        </view>
+        <view class="option-item {{legType === 'X型' ? 'selected' : ''}}" bindtap="selectLegType" data-type="X型">
+          <image class="option-icon" src="../../images/bodyType/legs3.png" mode="aspectFit"/>
+          <text>X型</text>
+        </view>
+        <view class="option-item {{legType === 'OX型' ? 'selected' : ''}}" bindtap="selectLegType" data-type="OX型">
+          <image class="option-icon" src="../../images/bodyType/legs4.png" mode="aspectFit"/>
+          <text>OX型</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 女性特有选项 -->
+    <block wx:if="{{userInfo.gender === '女'}}">
+      <!-- 大腿 -->
+      <view class="form-section">
+        <view class="section-title">大腿</view>
+        <view class="option-group">
+          <view class="option-item {{thighs === '偏细' ? 'selected' : ''}}" bindtap="selectThighs" data-type="偏细">
+            <image class="option-icon" src="../../images/bodyType/thighs1.png" mode="aspectFit"/>
+            <text>偏细</text>
+          </view>
+          <view class="option-item {{thighs === '匀称' ? 'selected' : ''}}" bindtap="selectThighs" data-type="匀称">
+            <image class="option-icon" src="../../images/bodyType/thighs2.png" mode="aspectFit"/>
+            <text>匀称</text>
+          </view>
+          <view class="option-item {{thighs === '偏粗' ? 'selected' : ''}}" bindtap="selectThighs" data-type="偏粗">
+            <image class="option-icon" src="../../images/bodyType/thighs3.png" mode="aspectFit"/>
+            <text>偏粗</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 小腿 -->
+      <view class="form-section">
+        <view class="section-title">小腿</view>
+        <view class="option-group">
+          <view class="option-item {{calves === '偏细' ? 'selected' : ''}}" bindtap="selectCalves" data-type="偏细">
+            <image class="option-icon" src="../../images/bodyType/calves1.png" mode="aspectFit"/>
+            <text>偏细</text>
+          </view>
+          <view class="option-item {{calves === '匀称' ? 'selected' : ''}}" bindtap="selectCalves" data-type="匀称">
+            <image class="option-icon" src="../../images/bodyType/calves2.png" mode="aspectFit"/>
+            <text>匀称</text>
+          </view>
+          <view class="option-item {{calves === '偏粗' ? 'selected' : ''}}" bindtap="selectCalves" data-type="偏粗">
+            <image class="option-icon" src="../../images/bodyType/calves3.png" mode="aspectFit"/>
+            <text>偏粗</text>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <!-- 保存按钮 -->
+  <view class="save-btn-container">
+    <button class="save-btn" bindtap="saveProfile">保存</button>
+  </view>
+</view> 

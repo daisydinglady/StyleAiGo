@@ -629,4 +629,12 @@ Page({
       },
     });
   },
+
+  // 跳转到身材档案页面
+  navigateToBodyProfile: function () {
+    console.log("跳转到身材档案页面");
+    wx.navigateTo({
+      url: "/pages/bodyProfile/bodyProfile",
+    });
+  },
 });
