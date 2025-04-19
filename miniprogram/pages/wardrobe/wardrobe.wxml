@@ -24,7 +24,9 @@
       <view class="category-tab {{currentCategory === 'all' ? 'active' : ''}}" bindtap="changeCategory" data-category="all">全部</view>
       <view class="category-tab {{currentCategory === 'tops' ? 'active' : ''}}" bindtap="changeCategory" data-category="tops">上装</view>
       <view class="category-tab {{currentCategory === 'pants' ? 'active' : ''}}" bindtap="changeCategory" data-category="pants">裤子</view>
+      <view class="category-tab {{currentCategory === 'skirts' ? 'active' : ''}}" bindtap="changeCategory" data-category="skirts">裙子</view>
       <view class="category-tab {{currentCategory === 'outerwear' ? 'active' : ''}}" bindtap="changeCategory" data-category="outerwear">外套</view>
+      <view class="category-tab {{currentCategory === 'innerwear' ? 'active' : ''}}" bindtap="changeCategory" data-category="innerwear">内搭</view>
       <view class="category-tab {{currentCategory === 'shoes' ? 'active' : ''}}" bindtap="changeCategory" data-category="shoes">鞋子</view>
       <view class="category-tab {{currentCategory === 'accessories' ? 'active' : ''}}" bindtap="changeCategory" data-category="accessories">配饰</view>
       <view class="category-tab {{currentCategory === 'bags' ? 'active' : ''}}" bindtap="changeCategory" data-category="bags">包包</view>

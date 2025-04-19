@@ -43,7 +43,7 @@
     <view class="card-item" bindtap="navigateToBodyProfile">
       <view class="item-label">身材建档</view>
       <view class="item-value">
-        <text class="gray-text">{{userInfo.bodyType || '未设置'}}</text>
+        <text class="gray-text">{{userInfo.bodyType ? '已设置' : '未设置'}}</text>
         <text class="arrow">></text>
       </view>
     </view>
